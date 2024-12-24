@@ -10,7 +10,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen">
-      <Sidebar expanded={expanded} className="w-64 border-r">
+      <Sidebar expanded={expanded} className="border-r bg-background">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-primary">HumaniChain</h1>
           <p className="text-sm text-muted-foreground mt-1">Transparent Aid Platform</p>
@@ -24,7 +24,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className="w-full justify-start"
               >
                 <LayoutDashboard className="mr-2 h-4 w-4" />
-                Dashboard
+                <span className={expanded ? "block" : "hidden"}>Dashboard</span>
               </Button>
             </Link>
 
@@ -34,7 +34,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className="w-full justify-start"
               >
                 <Vault className="mr-2 h-4 w-4" />
-                Vault
+                <span className={expanded ? "block" : "hidden"}>Vault</span>
               </Button>
             </Link>
 
@@ -44,7 +44,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className="w-full justify-start"
               >
                 <FileText className="mr-2 h-4 w-4" />
-                Projects
+                <span className={expanded ? "block" : "hidden"}>Projects</span>
               </Button>
             </Link>
 
@@ -54,7 +54,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className="w-full justify-start"
               >
                 <BarChart3 className="mr-2 h-4 w-4" />
-                Audit Trail
+                <span className={expanded ? "block" : "hidden"}>Audit Trail</span>
               </Button>
             </Link>
           </nav>
