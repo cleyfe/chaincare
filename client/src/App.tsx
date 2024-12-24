@@ -13,19 +13,25 @@ function App() {
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/dashboard">
-          <SidebarProvider>
-            <Layout>
-              <Switch>
-                <Route path="/dashboard" component={Dashboard} />
-                <Route path="/dashboard/vault" component={Vault} />
-                <Route path="/dashboard/projects" component={Projects} />
-              </Switch>
-            </Layout>
-          </SidebarProvider>
+          <DashboardLayout />
         </Route>
       </Switch>
       <Toaster />
     </>
+  );
+}
+
+function DashboardLayout() {
+  return (
+    <SidebarProvider>
+      <Layout>
+        <Switch>
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/dashboard/vault" component={Vault} />
+          <Route path="/dashboard/projects" component={Projects} />
+        </Switch>
+      </Layout>
+    </SidebarProvider>
   );
 }
 
