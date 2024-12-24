@@ -39,7 +39,26 @@ export const auditTrail = pgTable("audit_trail", {
   accountId: text("wallet_address")
 });
 
+export const rewardPoints = pgTable("reward_points", {
+  id: serial("id").primaryKey(),
+  accountId: text("wallet_address").notNull(),
+  points: numeric("points").notNull().default("0"),
+  level: text("level").notNull().default("Bronze"),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull()
+});
+
+export const pointsHistory = pgTable("points_history", {
+  id: serial("id").primaryKey(),
+  accountId: text("wallet_address").notNull(),
+  amount: numeric("points").notNull(),
+  reason: text("reason").notNull(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  investmentId: serial("investment_id").references(() => investments.id)
+});
+
 export type Investment = typeof investments.$inferSelect;
 export type Project = typeof projects.$inferSelect;
 export type Distribution = typeof distributions.$inferSelect;
 export type AuditTrail = typeof auditTrail.$inferSelect;
+export type RewardPoints = typeof rewardPoints.$inferSelect;
+export type PointsHistory = typeof pointsHistory.$inferSelect;

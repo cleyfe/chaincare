@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { db } from "@db";
-import { investments, projects, distributions, auditTrail } from "@db/schema";
+import { investments, projects, distributions, auditTrail, rewardPoints, pointsHistory } from "@db/schema";
 import { eq, and, sql } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -69,6 +69,7 @@ export function registerRoutes(app: Express): Server {
     res.json(activeProjects);
   });
 
+  // Projects by ID
   app.get("/api/projects/:id", async (req, res) => {
     const project = await db.query.projects.findFirst({
       where: eq(projects.id, parseInt(req.params.id))
@@ -97,5 +98,88 @@ export function registerRoutes(app: Express): Server {
     res.json(audit);
   });
 
+  // Rewards endpoints
+  app.get("/api/rewards/:accountId", async (req, res) => {
+    const accountId = req.params.accountId;
+    const [rewards, history] = await Promise.all([
+      db.query.rewardPoints.findFirst({
+        where: eq(rewardPoints.accountId, accountId)
+      }),
+      db.query.pointsHistory.findMany({
+        where: eq(pointsHistory.accountId, accountId),
+        orderBy: (pointsHistory, { desc }) => [desc(pointsHistory.timestamp)],
+        limit: 10
+      })
+    ]);
+
+    if (!rewards) {
+      res.status(404).json({ message: "Rewards not found for this account" });
+      return;
+    }
+
+    res.json({
+      ...rewards,
+      history
+    });
+  });
+
+  // Calculate and update points when a new investment is made
+  app.post("/api/deposits", async (req, res) => {
+    const { accountId, amount, transactionId } = req.body;
+
+    // Calculate points (1 point per USD invested)
+    const pointsToAdd = Math.floor(parseFloat(amount));
+
+    // Insert investment record
+    const [investment] = await db.insert(investments).values({
+      accountId,
+      amount,
+      transactionId
+    }).returning();
+
+    // Update or create rewards record
+    const existingRewards = await db.query.rewardPoints.findFirst({
+      where: eq(rewardPoints.accountId, accountId)
+    });
+
+    if (existingRewards) {
+      const newPoints = parseFloat(existingRewards.points) + pointsToAdd;
+      const newLevel = calculateLevel(newPoints);
+
+      await db.update(rewardPoints)
+        .set({ 
+          points: newPoints.toString(),
+          level: newLevel,
+          lastUpdated: new Date()
+        })
+        .where(eq(rewardPoints.accountId, accountId));
+    } else {
+      await db.insert(rewardPoints).values({
+        accountId,
+        points: pointsToAdd.toString(),
+        level: calculateLevel(pointsToAdd),
+        lastUpdated: new Date()
+      });
+    }
+
+    // Record points history
+    await db.insert(pointsHistory).values({
+      accountId,
+      amount: pointsToAdd.toString(),
+      reason: "Investment made",
+      investmentId: investment.id
+    });
+
+    res.json(investment);
+  });
+
   return httpServer;
+}
+
+// Helper function to calculate reward level based on points
+function calculateLevel(points: number): string {
+  if (points >= 10000) return "Platinum";
+  if (points >= 5000) return "Gold";
+  if (points >= 1000) return "Silver";
+  return "Bronze";
 }

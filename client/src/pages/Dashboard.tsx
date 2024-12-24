@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stats } from "@/components/Stats";
+import { RewardsCard } from "@/components/RewardsCard";
 import { TutorialDialog } from "@/components/TutorialDialog";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -41,7 +42,7 @@ export function Dashboard() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Deposit History</CardTitle>
+            <CardTitle>Investment History</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
@@ -62,37 +63,39 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Projects</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {projects.map((project) => (
-                <div 
-                  key={project.id}
-                  className="flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-medium">{project.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {project.description}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">
-                      {parseFloat(project.raisedAmount)} / {parseFloat(project.targetAmount)} ETH
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {Math.round((parseFloat(project.raisedAmount) / parseFloat(project.targetAmount)) * 100)}%
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <RewardsCard />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Active Projects</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {projects.map((project) => (
+              <div 
+                key={project.id}
+                className="flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-medium">{project.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {project.description}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">
+                    ${parseFloat(project.raisedAmount).toFixed(2)} / ${parseFloat(project.targetAmount).toFixed(2)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {Math.round((parseFloat(project.raisedAmount) / parseFloat(project.targetAmount)) * 100)}%
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
