@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -18,12 +18,12 @@ export function LandingPage() {
                 Join our innovative platform that generates sustainable funding for humanitarian projects through secure investments. Your capital remains protected while the returns create lasting impact.
               </p>
               <div className="mt-8 flex gap-x-4 sm:justify-center">
-                <Link href="/dashboard">
-                  <Button size="lg" className="gap-2">
+                <Button asChild size="lg" className="gap-2">
+                  <Link href="/dashboard">
                     Access Platform
                     <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>

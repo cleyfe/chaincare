@@ -12,19 +12,16 @@ function App() {
     <>
       <Switch>
         <Route path="/" component={LandingPage} />
-
-        <Route path="/dashboard/*">
-          {(params) => (
-            <SidebarProvider>
-              <Layout>
-                <Switch>
-                  <Route path="/dashboard" component={Dashboard} />
-                  <Route path="/dashboard/vault" component={Vault} />
-                  <Route path="/dashboard/projects" component={Projects} />
-                </Switch>
-              </Layout>
-            </SidebarProvider>
-          )}
+        <Route path="/dashboard">
+          <SidebarProvider>
+            <Layout>
+              <Switch>
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/dashboard/vault" component={Vault} />
+                <Route path="/dashboard/projects" component={Projects} />
+              </Switch>
+            </Layout>
+          </SidebarProvider>
         </Route>
       </Switch>
       <Toaster />
