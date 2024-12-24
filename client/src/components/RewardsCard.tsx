@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { getAccount } from "@/lib/web3";
+import { useEffect, useState } from "react";
 
 interface RewardsData {
   points: string;
@@ -14,11 +15,19 @@ interface RewardsData {
 }
 
 export function RewardsCard() {
-  const account = getAccount();
+  const [accountId, setAccountId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      const account = await getAccount();
+      setAccountId(account);
+    };
+    fetchAccount();
+  }, []);
 
   const { data: rewards } = useQuery<RewardsData>({
-    queryKey: [`/api/rewards/${account}`],
-    enabled: !!account,
+    queryKey: [accountId ? `/api/rewards/${accountId}` : null],
+    enabled: !!accountId,
     initialData: {
       points: "0",
       level: "Bronze",
@@ -61,7 +70,9 @@ export function RewardsCard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">No activity yet. Make your first investment to earn points!</p>
+                <p className="text-sm text-muted-foreground">
+                  No activity yet. Make your first investment to earn points!
+                </p>
               )}
             </div>
           </div>
