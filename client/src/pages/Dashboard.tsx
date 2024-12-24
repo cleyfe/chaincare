@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stats } from "@/components/Stats";
+import { TutorialDialog } from "@/components/TutorialDialog";
 import { useQuery } from "@tanstack/react-query";
 import {
   LineChart,
@@ -24,8 +25,13 @@ export function Dashboard() {
     initialData: []
   });
 
+  // Check if user has completed the tutorial
+  const tutorialCompleted = localStorage.getItem("tutorial-completed") === "true";
+
   return (
     <div className="space-y-6">
+      {!tutorialCompleted && <TutorialDialog />}
+
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
       </div>
