@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { db } from "@db";
-import { vaultDeposits, projects, distributions, auditTrail } from "@db/schema";
+import { investments, projects, distributions, auditTrail } from "@db/schema";
 import { eq, and, sql } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
@@ -15,7 +15,7 @@ export function registerRoutes(app: Express): Server {
       distributionsResult
     ] = await Promise.all([
       // Get total deposits and monthly growth
-      db.query.vaultDeposits.findMany(),
+      db.query.investments.findMany(),
       // Get project counts
       db.query.projects.findMany(),
       // Get distribution stats
@@ -47,16 +47,16 @@ export function registerRoutes(app: Express): Server {
       totalInterest,
       interestRate,
       totalDistributed: distributionsResult.reduce((sum, d) => sum + parseFloat(d.amount), 0),
-      beneficiaries: new Set(distributionsResult.map(d => d.recipientAddress)).size
+      beneficiaries: new Set(distributionsResult.map(d => d.recipientId)).size
     };
 
     res.json(stats);
   });
 
-  // Vault deposits
+  // Investments history
   app.get("/api/deposits", async (_req, res) => {
-    const deposits = await db.query.vaultDeposits.findMany({
-      orderBy: (deposits, { desc }) => [desc(deposits.timestamp)]
+    const deposits = await db.query.investments.findMany({
+      orderBy: (investments, { desc }) => [desc(investments.timestamp)]
     });
     res.json(deposits);
   });

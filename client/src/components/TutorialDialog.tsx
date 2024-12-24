@@ -20,22 +20,22 @@ import {
 const tutorialSteps = [
   {
     title: "Welcome to HumaniChain",
-    description: "Learn how our DeFi platform revolutionizes humanitarian aid through transparent and efficient asset distribution.",
+    description: "Learn how our innovative platform revolutionizes humanitarian aid through transparent and efficient asset management.",
     icon: Building2,
   },
   {
-    title: "Deposit Assets",
-    description: "Deposit your ETH into our Morpho vault. Your assets remain secure while generating interest through DeFi protocols.",
+    title: "Make an Impact Investment",
+    description: "Invest your funds in our secure investment pool. Your principal remains safe while generating returns for humanitarian causes.",
     icon: Coins,
   },
   {
-    title: "Interest Generation",
-    description: "The deposited assets generate interest through Morpho's lending protocols, creating a sustainable source of funding.",
+    title: "Generate Returns",
+    description: "Your investment generates returns through established financial protocols, creating a sustainable source of funding for aid.",
     icon: LineChart,
   },
   {
     title: "Transparent Distribution",
-    description: "100% of the generated interest is used to fund verified humanitarian projects. Every transaction is recorded on the blockchain.",
+    description: "100% of the generated returns are used to fund verified humanitarian projects. Every transaction is recorded and traceable.",
     icon: Users2,
   },
   {
@@ -53,7 +53,6 @@ export function TutorialDialog() {
     if (currentStep < tutorialSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Store completion in localStorage
       localStorage.setItem("tutorial-completed", "true");
       setOpen(false);
     }

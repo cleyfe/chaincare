@@ -1,12 +1,12 @@
 import { pgTable, text, serial, timestamp, numeric, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-export const vaultDeposits = pgTable("vault_deposits", {
+export const investments = pgTable("vault_deposits", {
   id: serial("id").primaryKey(),
-  walletAddress: text("wallet_address").notNull(),
+  accountId: text("wallet_address").notNull(),
   amount: numeric("amount").notNull(),
   timestamp: timestamp("timestamp").defaultNow().notNull(),
-  txHash: text("tx_hash").notNull(),
+  transactionId: text("tx_hash").notNull(),
 });
 
 export const projects = pgTable("projects", {
@@ -24,8 +24,8 @@ export const distributions = pgTable("distributions", {
   id: serial("id").primaryKey(),
   projectId: serial("project_id").references(() => projects.id),
   amount: numeric("amount").notNull(),
-  recipientAddress: text("recipient_address").notNull(),
-  txHash: text("tx_hash").notNull(),
+  recipientId: text("recipient_address").notNull(),
+  transactionId: text("tx_hash").notNull(),
   timestamp: timestamp("timestamp").defaultNow().notNull(),
   status: text("status").notNull()
 });
@@ -35,11 +35,11 @@ export const auditTrail = pgTable("audit_trail", {
   eventType: text("event_type").notNull(),
   details: text("details").notNull(),
   timestamp: timestamp("timestamp").defaultNow().notNull(),
-  txHash: text("tx_hash"),
-  walletAddress: text("wallet_address")
+  transactionId: text("tx_hash"),
+  accountId: text("wallet_address")
 });
 
-export type VaultDeposit = typeof vaultDeposits.$inferSelect;
+export type Investment = typeof investments.$inferSelect;
 export type Project = typeof projects.$inferSelect;
 export type Distribution = typeof distributions.$inferSelect;
 export type AuditTrail = typeof auditTrail.$inferSelect;
