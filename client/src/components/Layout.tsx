@@ -13,48 +13,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <Sidebar expanded={expanded} className="border-r">
         <div className="p-6">
           <h1 className="text-xl md:text-2xl font-bold text-primary">HumaniChain</h1>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">Transparent Aid Platform</p>
+          <p className="text-xs md:text-sm text-muted-foreground mt-1">Impact Investment Platform</p>
         </div>
 
         <div className="px-3 py-2">
           <nav className="space-y-1 md:space-y-2">
-            <Link href="/">
+            <Link href="/dashboard">
               <Button
-                variant={location === "/" ? "secondary" : "ghost"}
+                variant={location === "/dashboard" ? "secondary" : "ghost"}
                 className="w-full justify-start"
               >
                 <LayoutDashboard className="h-4 w-4" />
-                <span className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}>Dashboard</span>
+                <span className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}>Overview</span>
               </Button>
             </Link>
 
-            <Link href="/vault">
+            <Link href="/dashboard/vault">
               <Button
-                variant={location === "/vault" ? "secondary" : "ghost"}
+                variant={location === "/dashboard/vault" ? "secondary" : "ghost"}
                 className="w-full justify-start"
               >
                 <Vault className="h-4 w-4" />
-                <span className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}>Vault</span>
+                <span className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}>Investment Pool</span>
               </Button>
             </Link>
 
-            <Link href="/projects">
+            <Link href="/dashboard/projects">
               <Button
-                variant={location === "/projects" ? "secondary" : "ghost"}
+                variant={location === "/dashboard/projects" ? "secondary" : "ghost"}
                 className="w-full justify-start"
               >
                 <FileText className="h-4 w-4" />
                 <span className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}>Projects</span>
-              </Button>
-            </Link>
-
-            <Link href="/audit">
-              <Button
-                variant={location === "/audit" ? "secondary" : "ghost"}
-                className="w-full justify-start"
-              >
-                <BarChart3 className="h-4 w-4" />
-                <span className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}>Audit Trail</span>
               </Button>
             </Link>
           </nav>
