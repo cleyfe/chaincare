@@ -2,11 +2,12 @@ import { Switch, Route, useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
 import { LandingPage } from "@/pages/LandingPage";
+import { FAQ } from "@/pages/FAQ";
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   DynamicContextProvider,
-  useDynamicContext,
   DynamicWidget,
   useIsLoggedIn,
 } from "@dynamic-labs/sdk-react-core";
@@ -41,15 +42,17 @@ function App() {
         walletConnectors: [EthereumWalletConnectors],
       }}
     >
-      <AuthenticatedApp />
+      <TooltipProvider>
+        <AuthenticatedApp />
+      </TooltipProvider>
     </DynamicContextProvider>
   );
 }
 
 function AuthenticatedApp() {
-  const { isLoading } = useDynamicContext();
   const [location, setLocation] = useLocation();
   const isLoggedIn = useIsLoggedIn();
+  const isLoading = false; 
 
   useEffect(() => {
     if (isLoggedIn && location === "/") {
@@ -69,6 +72,7 @@ function AuthenticatedApp() {
     <>
       <Switch>
         <Route path="/" component={LandingPage} />
+        <Route path="/faq" component={FAQ} />
         <Route path="/dashboard">
           {isLoggedIn ? (
             <SidebarProvider>

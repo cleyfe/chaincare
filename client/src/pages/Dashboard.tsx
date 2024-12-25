@@ -6,10 +6,31 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
-import type { Stats } from "@/types/api";
 import { initWeb3, getAccount } from "@/lib/web3";
 import { MorphoVault } from "@/lib/morpho";
 import { ethers } from "ethers";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
+
+interface RewardsData {
+  points: string;
+  level: string;
+  history: Array<{
+    amount: string;
+    reason: string;
+    timestamp: string;
+  }>;
+}
+
+interface Stats {
+  totalDeposits: number;
+  depositGrowth: number;
+  activeProjects: number;
+  completedProjects: number;
+  totalInterest: number;
+  interestRate: number;
+  totalDistributed: number;
+  beneficiaries: number;
+}
 
 const ETH_TO_USD = 2000; // Fixed conversion rate for demonstration
 
@@ -24,9 +45,14 @@ export function Dashboard() {
     queryKey: ["/api/stats"]
   });
 
-  const { data: userRewards } = useQuery({
+  const { data: userRewards } = useQuery<RewardsData>({
     queryKey: [primaryWallet?.address ? `/api/rewards/${primaryWallet.address}` : null],
-    enabled: !!primaryWallet?.address
+    enabled: !!primaryWallet?.address,
+    initialData: {
+      points: "0",
+      level: "Bronze",
+      history: []
+    }
   });
 
   const formatUSD = (ethAmount: number) => {
@@ -38,23 +64,28 @@ export function Dashboard() {
   };
 
   const handleDeposit = async () => {
+    if (!window.ethereum) {
+      toast({
+        variant: "destructive",
+        title: "Wallet not found",
+        description: "Please install a Web3 wallet like MetaMask"
+      });
+      return;
+    }
+
     try {
       setIsDepositing(true);
-      const web3 = await initWeb3();
-      const account = await getAccount();
-
       const provider = new ethers.BrowserProvider(window.ethereum);
       const vault = new MorphoVault(provider);
-
       const tx = await vault.deposit(depositAmount);
 
       await fetch("/api/deposits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          walletAddress: account,
+          walletAddress: primaryWallet?.address,
           amount: depositAmount,
-          txHash: tx.transactionHash
+          txHash: tx.hash
         })
       });
 
@@ -181,15 +212,27 @@ export function Dashboard() {
             <div className="flex gap-4 items-center justify-center p-4 bg-muted/30 rounded-lg">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-primary" />
-                <span className="text-sm">Non-Custodial</span>
+                <InfoTooltip
+                  term="Non-Custodial"
+                  description="You maintain full control of your funds at all times. We never take possession of your assets."
+                  link="/faq#non-custodial"
+                />
               </div>
               <div className="flex items-center gap-2">
                 <Lock className="h-5 w-5 text-primary" />
-                <span className="text-sm">Bank-Grade Security</span>
+                <InfoTooltip
+                  term="Smart Contract Security"
+                  description="Your funds are secured by audited smart contracts on the blockchain."
+                  link="/faq#smart-contracts"
+                />
               </div>
               <div className="flex items-center gap-2">
                 <Eye className="h-5 w-5 text-primary" />
-                <span className="text-sm">Full Transparency</span>
+                <InfoTooltip
+                  term="DeFi Transparency"
+                  description="All transactions and fund movements are publicly verifiable on the blockchain."
+                  link="/faq#defi"
+                />
               </div>
             </div>
 
@@ -205,7 +248,7 @@ export function Dashboard() {
                     onChange={(e) => setDepositAmount(e.target.value)}
                     className="max-w-[200px]"
                   />
-                  <Button 
+                  <Button
                     onClick={handleDeposit}
                     disabled={!depositAmount || isDepositing}
                   >
@@ -243,12 +286,24 @@ export function Dashboard() {
               </div>
             </div>
 
-            {/* How It Works */}
+            {/* How It Works with tooltips */}
             <div className="bg-muted/30 p-4 rounded-lg">
               <h3 className="font-semibold mb-2">How It Works</h3>
               <ol className="space-y-2 text-sm text-muted-foreground">
-                <li>1. Your deposit is securely held in a non-custodial smart contract</li>
-                <li>2. Funds generate yield through established DeFi lending protocols</li>
+                <li>1. Your deposit is securely held in a{' '}
+                  <InfoTooltip
+                    term="non-custodial smart contract"
+                    description="A secure, automated program that holds your funds while maintaining your full control."
+                    link="/faq#smart-contracts"
+                  />
+                </li>
+                <li>2. Funds generate yield through established{' '}
+                  <InfoTooltip
+                    term="DeFi lending protocols"
+                    description="Decentralized platforms that facilitate lending and borrowing of digital assets to generate returns."
+                    link="/faq#lending-protocols"
+                  />
+                </li>
                 <li>3. Generated returns are automatically directed to verified humanitarian projects</li>
                 <li>4. Withdraw your initial deposit at any time, while the returns create lasting impact</li>
               </ol>

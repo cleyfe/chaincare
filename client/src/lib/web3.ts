@@ -1,4 +1,11 @@
 import Web3 from 'web3';
+import type { MetaMaskInpageProvider } from "@metamask/providers";
+
+declare global {
+  interface Window {
+    ethereum?: MetaMaskInpageProvider;
+  }
+}
 
 let web3: Web3 | null = null;
 
@@ -7,7 +14,7 @@ export const initWeb3 = async () => {
 
   try {
     if (typeof window.ethereum !== 'undefined') {
-      web3 = new Web3(window.ethereum);
+      web3 = new Web3(window.ethereum as any);
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       return web3;
     }
