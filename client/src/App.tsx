@@ -1,12 +1,15 @@
 import { Switch, Route, useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
-import { Vault } from "@/pages/Vault";
-import { Projects } from "@/pages/Projects";
 import { LandingPage } from "@/pages/LandingPage";
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar-provider";
-import { DynamicContextProvider, useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import {
+  DynamicContextProvider,
+  useDynamicContext,
+  DynamicWidget,
+  useIsLoggedIn,
+} from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -19,9 +22,12 @@ function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Configuration Error</h1>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">
+            Configuration Error
+          </h1>
           <p className="text-muted-foreground">
-            Dynamic SDK configuration is missing. Please check your environment variables.
+            Dynamic SDK configuration is missing. Please check your environment
+            variables.
           </p>
         </div>
       </div>
@@ -41,14 +47,15 @@ function App() {
 }
 
 function AuthenticatedApp() {
-  const { isAuthenticated, isLoading } = useDynamicContext();
+  const { isLoading } = useDynamicContext();
   const [location, setLocation] = useLocation();
+  const isLoggedIn = useIsLoggedIn();
 
   useEffect(() => {
-    if (isAuthenticated && location === "/") {
+    if (isLoggedIn && location === "/") {
       setLocation("/dashboard");
     }
-  }, [isAuthenticated, location, setLocation]);
+  }, [isLoggedIn, location, setLocation]);
 
   if (isLoading) {
     return (
@@ -63,14 +70,10 @@ function AuthenticatedApp() {
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/dashboard">
-          {isAuthenticated ? (
+          {isLoggedIn ? (
             <SidebarProvider>
               <Layout>
-                <Switch>
-                  <Route path="/dashboard" component={Dashboard} />
-                  <Route path="/dashboard/vault" component={Vault} />
-                  <Route path="/dashboard/projects" component={Projects} />
-                </Switch>
+                <Dashboard />
               </Layout>
             </SidebarProvider>
           ) : (
