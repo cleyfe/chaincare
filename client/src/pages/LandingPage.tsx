@@ -141,6 +141,47 @@ export function LandingPage() {
           </div>
         </div>
       </div>
+
+      {/* CTA Section */}
+      <div className="bg-primary/5 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Ready to Make an Impact?
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
+              Join our community of impact investors and start creating positive change today.
+              Your investment can make a real difference in the world.
+            </p>
+            <div className="mt-10">
+              <Button asChild size="lg" className="gap-2">
+                <Link href="/dashboard">
+                  Start Investing
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t">
+        <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
+          <div className="flex justify-center space-x-6 md:order-2">
+            <Link href="/dashboard">
+              <span className="text-sm leading-6 text-muted-foreground hover:text-primary">
+                Dashboard
+              </span>
+            </Link>
+          </div>
+          <div className="mt-8 md:order-1 md:mt-0">
+            <p className="text-center text-sm leading-6 text-muted-foreground">
+              &copy; {new Date().getFullYear()} HumaniChain. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
