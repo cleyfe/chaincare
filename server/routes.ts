@@ -1,11 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { setupAuth } from "./auth";
 import { db } from "@db";
 import { investments, projects, distributions, auditTrail, rewardPoints, pointsHistory } from "@db/schema";
 import { eq, and, sql } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
+
+  // Setup authentication routes and middleware
+  setupAuth(app);
 
   // Stats endpoint
   app.get("/api/stats", async (_req, res) => {
