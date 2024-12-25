@@ -42,13 +42,13 @@ function App() {
 
 function AuthenticatedApp() {
   const { isAuthenticated, isLoading } = useDynamicContext();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && location === "/") {
       setLocation("/dashboard");
     }
-  }, [isAuthenticated, setLocation]);
+  }, [isAuthenticated, location, setLocation]);
 
   if (isLoading) {
     return (
@@ -62,7 +62,7 @@ function AuthenticatedApp() {
     <>
       <Switch>
         <Route path="/" component={LandingPage} />
-        <Route path="/dashboard/*">
+        <Route path="/dashboard">
           {isAuthenticated ? (
             <SidebarProvider>
               <Layout>
