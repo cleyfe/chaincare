@@ -1,6 +1,14 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Coins, ShieldCheck, BarChart3, PiggyBank, Banknote, Heart } from "lucide-react";
+import {
+  ArrowRight,
+  Coins,
+  ShieldCheck,
+  BarChart3,
+  PiggyBank,
+  Banknote,
+  Heart,
+} from "lucide-react";
 
 export function LandingPage() {
   return (
@@ -12,15 +20,19 @@ export function LandingPage() {
             <div className="flex items-center">
               <Link href="/">
                 <div className="flex items-center space-x-2 cursor-pointer">
-                  <img src="/logo.svg" alt="HumaniChain Logo" className="h-8 w-8" />
-                  <span className="font-bold text-xl text-primary">HumaniChain</span>
+                  <img
+                    src="/logo.svg"
+                    alt="HumaniChain Logo"
+                    className="h-8 w-8"
+                  />
+                  <span className="font-bold text-xl text-primary">
+                    HumaniChain
+                  </span>
                 </div>
               </Link>
             </div>
             <Button asChild variant="default" size="sm">
-              <Link href="/dashboard">
-                Open App
-              </Link>
+              <Link href="/dashboard">Open App</Link>
             </Button>
           </div>
         </div>
@@ -32,11 +44,12 @@ export function LandingPage() {
           <div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight sm:text-center sm:text-6xl">
-                Smart Investing for 
+                Smart Investing for
                 <span className="text-primary"> Social Good</span>
               </h1>
               <p className="mt-6 text-lg leading-8 text-muted-foreground sm:text-center">
-                Turn your investments into impact. Our secure platform helps fund humanitarian aid, animal welfare, and community projects while protecting your capital.
+                Support humanitarian causes without spending a dime. Simply deposit your funds,
+                earn returns, and make an impact while keeping full control of your money.
               </p>
               <div className="mt-8 flex gap-x-4 sm:justify-center">
                 <Button asChild size="lg" className="gap-2">
@@ -55,7 +68,9 @@ export function LandingPage() {
       <div className="bg-muted/50 py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:text-center">
-            <h2 className="text-base font-semibold leading-7 text-primary">Impact Investment</h2>
+            <h2 className="text-base font-semibold leading-7 text-primary">
+              Impact Investment
+            </h2>
             <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
               A New Way to Create Change
             </p>
@@ -66,9 +81,7 @@ export function LandingPage() {
                 <div className="mb-6 rounded-lg bg-primary/10 p-4">
                   <ShieldCheck className="h-8 w-8 text-primary" />
                 </div>
-                <dt className="text-lg font-semibold">
-                  Secure Investment
-                </dt>
+                <dt className="text-lg font-semibold">Secure Investment</dt>
                 <dd className="mt-2 text-sm text-muted-foreground">
                   Your principal remains safe and under your control
                 </dd>
@@ -88,9 +101,7 @@ export function LandingPage() {
                 <div className="mb-6 rounded-lg bg-primary/10 p-4">
                   <Heart className="h-8 w-8 text-primary" />
                 </div>
-                <dt className="text-lg font-semibold">
-                  Create Impact
-                </dt>
+                <dt className="text-lg font-semibold">Create Impact</dt>
                 <dd className="mt-2 text-sm text-muted-foreground">
                   Your returns fund verified humanitarian projects
                 </dd>
@@ -108,10 +119,19 @@ export function LandingPage() {
               Who We Are
             </h2>
             <p className="text-lg leading-8 text-muted-foreground">
-              We are a passionate individual driven by the belief that technology and finance can be powerful forces for good. With a background in both humanitarian work and blockchain technology, we've created HumaniChain to bridge the gap between profitable investing and meaningful social impact.
+              A passionate individual driven by the belief that technology and
+              finance can be powerful forces for good. With a background in both
+              finance and blockchain technology and a network in humanitarian
+              aid, I've created HumaniChain to bridge the gap between profitable
+              investing and meaningful social impact.
             </p>
             <p className="mt-4 text-lg leading-8 text-muted-foreground">
-              Our mission is to revolutionize charitable giving by creating sustainable funding streams through innovative financial technologies. We believe that by combining the efficiency of DeFi with the heart of humanitarian aid, we can create lasting positive change in communities worldwide.
+              The mission of HumaniChain is to revolutionize charitable giving
+              by creating sustainable funding streams through innovative
+              financial technologies. I believe that by combining the efficiency
+              of Decentralized Finance (read: blockchain-powered peer-to-peer
+              finance) with the heart of humanitarian aid, we can create lasting
+              positive change in communities worldwide.
             </p>
           </div>
         </div>
@@ -135,10 +155,13 @@ export function LandingPage() {
                     <PiggyBank className="h-8 w-8 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">1. Deposit Your Funds</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      1. Deposit Your Funds
+                    </h3>
                     <p className="text-muted-foreground">
-                      Connect your wallet and deposit funds into our secure lending vault. 
-                      Your deposit remains under your control and can be withdrawn at any time.
+                      Connect your wallet and deposit funds into our secure
+                      lending vault. Your deposit remains under your control and
+                      can be withdrawn at any time.
                     </p>
                   </div>
                 </div>
@@ -151,10 +174,13 @@ export function LandingPage() {
                     <Coins className="h-8 w-8 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">2. Generate Interest</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      2. Generate Interest
+                    </h3>
                     <p className="text-muted-foreground">
-                      Your deposit automatically generates interest through established lending protocols.
-                      Think of it like a savings account, but with a purpose.
+                      Your deposit automatically generates interest through
+                      established lending protocols. Think of it like a savings
+                      account, but with a purpose.
                     </p>
                   </div>
                 </div>
@@ -167,10 +193,13 @@ export function LandingPage() {
                     <Banknote className="h-8 w-8 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">3. Create Impact</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      3. Create Impact
+                    </h3>
                     <p className="text-muted-foreground">
-                      The interest earned is automatically directed to verified humanitarian projects.
-                      You keep your deposit while your returns make a real difference in the world.
+                      The interest earned is automatically directed to verified
+                      humanitarian projects. You keep your deposit while your
+                      returns make a real difference in the world.
                     </p>
                   </div>
                 </div>
@@ -188,8 +217,9 @@ export function LandingPage() {
               Ready to Make an Impact?
             </h2>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">
-              Join our community of impact investors and start creating positive change today.
-              Your investment can make a real difference in the world.
+              Join our community of impact investors and start creating positive
+              change today. Your investment can make a real difference in the
+              world.
             </p>
             <div className="mt-10">
               <Button asChild size="lg" className="gap-2">
@@ -215,7 +245,8 @@ export function LandingPage() {
           </div>
           <div className="mt-8 md:order-1 md:mt-0">
             <p className="text-center text-sm leading-6 text-muted-foreground">
-              &copy; {new Date().getFullYear()} HumaniChain. All rights reserved.
+              &copy; {new Date().getFullYear()} HumaniChain. All rights
+              reserved.
             </p>
           </div>
         </div>
