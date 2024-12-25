@@ -62,7 +62,7 @@ function AuthenticatedApp() {
     <>
       <Switch>
         <Route path="/" component={LandingPage} />
-        <Route path="/dashboard">
+        <Route path="/dashboard/*">
           {isAuthenticated ? (
             <SidebarProvider>
               <Layout>
