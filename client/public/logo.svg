@@ -1,0 +1,8 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle representing the world/community -->
+  <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2" class="text-primary"/>
+  <!-- Heart shape representing humanitarian impact -->
+  <path d="M20 26C20 26 14 21.5 14 17.5C14 15.5 15.5 14 17.5 14C18.8 14 19.9 14.7 20 15.8C20.1 14.7 21.2 14 22.5 14C24.5 14 26 15.5 26 17.5C26 21.5 20 26 20 26Z" fill="currentColor" class="text-primary"/>
+  <!-- Coin shape representing finance -->
+  <circle cx="20" cy="20" r="8" stroke="currentColor" stroke-width="2" class="text-primary" fill="none"/>
+</svg>

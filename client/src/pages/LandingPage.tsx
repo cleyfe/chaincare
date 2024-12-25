@@ -5,6 +5,27 @@ import { ArrowRight, Coins, ShieldCheck, BarChart3, PiggyBank, Banknote, Heart }
 export function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
+      {/* Top Navigation */}
+      <nav className="border-b">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="relative flex h-16 items-center justify-between">
+            <div className="flex items-center">
+              <Link href="/">
+                <div className="flex items-center space-x-2 cursor-pointer">
+                  <img src="/logo.svg" alt="HumaniChain Logo" className="h-8 w-8" />
+                  <span className="font-bold text-xl text-primary">HumaniChain</span>
+                </div>
+              </Link>
+            </div>
+            <Button asChild variant="default" size="sm">
+              <Link href="/dashboard">
+                Open App
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <div className="relative px-6 lg:px-8">
         <div className="mx-auto max-w-3xl pt-20 pb-32 sm:pt-48 sm:pb-40">
@@ -57,10 +78,10 @@ export function LandingPage() {
                   <BarChart3 className="h-8 w-8 text-primary" />
                 </div>
                 <dt className="text-lg font-semibold">
-                  Generate Returns
+                  Generate Returns for Good
                 </dt>
                 <dd className="mt-2 text-sm text-muted-foreground">
-                  Earn competitive interest rates
+                  Turn investment yields into positive change
                 </dd>
               </div>
               <div className="flex flex-col items-center text-center">
@@ -79,8 +100,25 @@ export function LandingPage() {
         </div>
       </div>
 
-      {/* How it Works Section */}
+      {/* Who We Are Section */}
       <div className="py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
+              Who We Are
+            </h2>
+            <p className="text-lg leading-8 text-muted-foreground">
+              We are a passionate individual driven by the belief that technology and finance can be powerful forces for good. With a background in both humanitarian work and blockchain technology, we've created HumaniChain to bridge the gap between profitable investing and meaningful social impact.
+            </p>
+            <p className="mt-4 text-lg leading-8 text-muted-foreground">
+              Our mission is to revolutionize charitable giving by creating sustainable funding streams through innovative financial technologies. We believe that by combining the efficiency of DeFi with the heart of humanitarian aid, we can create lasting positive change in communities worldwide.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* How it Works Section */}
+      <div className="bg-muted/50 py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-16">
@@ -143,7 +181,7 @@ export function LandingPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-primary/5 py-24 sm:py-32">
+      <div className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
