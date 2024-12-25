@@ -11,6 +11,8 @@ import { initWeb3, getAccount } from "@/lib/web3";
 import { MorphoVault } from "@/lib/morpho";
 import { ethers } from "ethers";
 
+const ETH_TO_USD = 2000; // Fixed conversion rate for demonstration
+
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState("");
   const [isDepositing, setIsDepositing] = useState(false);
@@ -26,6 +28,14 @@ export function Dashboard() {
     enabled: !!primaryWallet?.address
   });
 
+  const formatUSD = (ethAmount: number) => {
+    const usdAmount = ethAmount * ETH_TO_USD;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(usdAmount);
+  };
+
   const handleDeposit = async () => {
     try {
       setIsDepositing(true);
@@ -37,7 +47,6 @@ export function Dashboard() {
 
       const tx = await vault.deposit(depositAmount);
 
-      // Add deposit to database
       await fetch("/api/deposits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -50,7 +59,7 @@ export function Dashboard() {
 
       toast({
         title: "Deposit successful",
-        description: `Deposited ${depositAmount} ETH into the humanitarian fund`
+        description: `Deposited ${formatUSD(parseFloat(depositAmount))} into the humanitarian fund`
       });
 
       setDepositAmount("");
@@ -90,7 +99,7 @@ export function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalDeposits.toFixed(2)} ETH</div>
+            <div className="text-2xl font-bold">{formatUSD(stats?.totalDeposits || 0)}</div>
             <p className="text-xs text-muted-foreground">
               +{stats?.depositGrowth.toFixed(2)}% from last month
             </p>
@@ -105,7 +114,7 @@ export function Dashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{stats?.interestRate}%</div>
             <p className="text-xs text-muted-foreground">
-              {stats?.totalInterest.toFixed(4)} ETH generated
+              {formatUSD(stats?.totalInterest || 0)} generated
             </p>
           </CardContent>
         </Card>
@@ -116,7 +125,7 @@ export function Dashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalDistributed.toFixed(2)} ETH</div>
+            <div className="text-2xl font-bold">{formatUSD(stats?.totalDistributed || 0)}</div>
             <p className="text-xs text-muted-foreground">
               To {stats?.beneficiaries} beneficiaries
             </p>
@@ -143,30 +152,37 @@ export function Dashboard() {
           <CardTitle>Make a Deposit</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex space-x-4">
-            <Input
-              type="number"
-              placeholder="Amount in ETH"
-              value={depositAmount}
-              onChange={(e) => setDepositAmount(e.target.value)}
-              className="max-w-[200px]"
-            />
-            <Button 
-              onClick={handleDeposit}
-              disabled={!depositAmount || isDepositing}
-            >
-              {isDepositing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Depositing...
-                </>
-              ) : (
-                <>
-                  <Coins className="mr-2 h-4 w-4" />
-                  Deposit ETH
-                </>
-              )}
-            </Button>
+          <div className="flex flex-col space-y-2">
+            <div className="flex space-x-4">
+              <Input
+                type="number"
+                placeholder="Amount in USD"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount((parseFloat(e.target.value) / ETH_TO_USD).toString())}
+                className="max-w-[200px]"
+              />
+              <Button 
+                onClick={handleDeposit}
+                disabled={!depositAmount || isDepositing}
+              >
+                {isDepositing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Depositing...
+                  </>
+                ) : (
+                  <>
+                    <Coins className="mr-2 h-4 w-4" />
+                    Deposit Funds
+                  </>
+                )}
+              </Button>
+            </div>
+            {depositAmount && (
+              <p className="text-sm text-muted-foreground">
+                ≈ {formatUSD(parseFloat(depositAmount))}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
