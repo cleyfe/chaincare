@@ -14,8 +14,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <Sidebar expanded={expanded} className="border-r">
         <div className="p-6">
           <Link href="/">
-            <h1 className="text-xl md:text-2xl font-bold text-primary cursor-pointer">HumaniChain</h1>
-            <p className="text-xs md:text-sm text-muted-foreground mt-1">Impact Investment Platform</p>
+            <h1 className="text-xl md:text-2xl font-bold text-primary cursor-pointer">
+              ChainCare
+            </h1>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">
+              Impact Investment Platform
+            </p>
           </Link>
         </div>
 
@@ -27,7 +31,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className="w-full justify-start"
               >
                 <LayoutDashboard className="h-4 w-4" />
-                <span className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}>Dashboard</span>
+                <span
+                  className={`ml-2 ${expanded ? "block" : "hidden md:block"}`}
+                >
+                  Dashboard
+                </span>
               </Button>
             </Link>
           </nav>

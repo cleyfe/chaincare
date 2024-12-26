@@ -8,6 +8,7 @@ import {
   PiggyBank,
   Banknote,
   Heart,
+  Info,
 } from "lucide-react";
 
 export function LandingPage() {
@@ -22,18 +23,26 @@ export function LandingPage() {
                 <div className="flex items-center space-x-2 cursor-pointer">
                   <img
                     src="/logo.svg"
-                    alt="HumaniChain Logo"
+                    alt="ChainCare Logo"
                     className="h-8 w-8"
                   />
                   <span className="font-bold text-xl text-primary">
-                    HumaniChain
+                    ChainCare
                   </span>
                 </div>
               </Link>
             </div>
-            <Button asChild variant="default" size="sm">
-              <Link href="/dashboard">Open App</Link>
-            </Button>
+            <div className="flex gap-4">
+              <Link href="/faq">
+                <Button variant="ghost" size="sm">
+                  <Info className="h-4 w-4 mr-2" />
+                  FAQ
+                </Button>
+              </Link>
+              <Button asChild variant="default" size="sm">
+                <Link href="/dashboard">Open App</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
@@ -44,12 +53,11 @@ export function LandingPage() {
           <div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight sm:text-center sm:text-6xl">
-                Smart Investing for
-                <span className="text-primary"> Social Good</span>
+                Fund Good Actions Without Spending a Dime
               </h1>
               <p className="mt-6 text-lg leading-8 text-muted-foreground sm:text-center">
-                Support humanitarian causes without spending a dime. Simply deposit your funds,
-                earn returns, and make an impact while keeping full control of your money.
+                Simply deposit your funds, earn returns, and create impact while keeping full control. 
+                Withdraw anytime – your money works for good while staying yours.
               </p>
               <div className="mt-8 flex gap-x-4 sm:justify-center">
                 <Button asChild size="lg" className="gap-2">
@@ -107,32 +115,6 @@ export function LandingPage() {
                 </dd>
               </div>
             </dl>
-          </div>
-        </div>
-      </div>
-
-      {/* Who We Are Section */}
-      <div className="py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl lg:text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
-              Who We Are
-            </h2>
-            <p className="text-lg leading-8 text-muted-foreground">
-              A passionate individual driven by the belief that technology and
-              finance can be powerful forces for good. With a background in both
-              finance and blockchain technology and a network in humanitarian
-              aid, I've created HumaniChain to bridge the gap between profitable
-              investing and meaningful social impact.
-            </p>
-            <p className="mt-4 text-lg leading-8 text-muted-foreground">
-              The mission of HumaniChain is to revolutionize charitable giving
-              by creating sustainable funding streams through innovative
-              financial technologies. I believe that by combining the efficiency
-              of Decentralized Finance (read: blockchain-powered peer-to-peer
-              finance) with the heart of humanitarian aid, we can create lasting
-              positive change in communities worldwide.
-            </p>
           </div>
         </div>
       </div>
@@ -209,6 +191,61 @@ export function LandingPage() {
         </div>
       </div>
 
+      {/* FAQ Section */}
+      <div className="py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-16">
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          <div className="mx-auto max-w-4xl">
+            <div className="space-y-16">
+              <div>
+                <h3 className="text-xl font-semibold mb-4">What is Decentralized Finance (DeFi)?</h3>
+                <p className="text-muted-foreground">
+                  DeFi is a modern financial system that operates on blockchain technology without traditional 
+                  intermediaries like banks. It's like having a digital banking system that's open to everyone, 
+                  transparent with all transactions publicly visible, available 24/7, and automated through 
+                  smart contracts.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold mb-4">What does Non-Custodial mean?</h3>
+                <p className="text-muted-foreground">
+                  Non-custodial means you maintain full control over your funds at all times. Think of it like 
+                  having a personal safe that only you have the key to. You don't need to trust us with your money, 
+                  only you can access and move your funds, and you can withdraw your deposits at any time.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold mb-4">What are Smart Contracts?</h3>
+                <p className="text-muted-foreground">
+                  Smart contracts are like digital vending machines: they automatically execute actions when 
+                  certain conditions are met. They provide automated execution without human intervention, 
+                  transparent rules that cannot be changed once deployed, and secure, tamper-proof operation 
+                  with open-source code that anyone can verify.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold mb-4">How do Lending Protocols Work?</h3>
+                <p className="text-muted-foreground">
+                  Lending protocols are decentralized platforms that facilitate lending and borrowing of 
+                  digital assets. Users deposit funds into a lending pool, borrowers take loans by providing 
+                  collateral, and interest rates are automatically adjusted based on supply and demand. In 
+                  ChainCare's case, we use these protocols to generate returns on your deposits, which are then 
+                  directed to humanitarian causes while your initial deposit remains safe and under your control.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* CTA Section */}
       <div className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -245,8 +282,7 @@ export function LandingPage() {
           </div>
           <div className="mt-8 md:order-1 md:mt-0">
             <p className="text-center text-sm leading-6 text-muted-foreground">
-              &copy; {new Date().getFullYear()} HumaniChain. All rights
-              reserved.
+              &copy; {new Date().getFullYear()} ChainCare. All rights reserved.
             </p>
           </div>
         </div>

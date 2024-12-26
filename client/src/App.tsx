@@ -13,7 +13,6 @@ import {
 } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
 
 function App() {
   const environmentId = import.meta.env.VITE_DYNAMIC_ENVIRONMENT_ID;
@@ -50,15 +49,9 @@ function App() {
 }
 
 function AuthenticatedApp() {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const isLoggedIn = useIsLoggedIn();
-  const isLoading = false; 
-
-  useEffect(() => {
-    if (isLoggedIn && location === "/") {
-      setLocation("/dashboard");
-    }
-  }, [isLoggedIn, location, setLocation]);
+  const isLoading = false;
 
   if (isLoading) {
     return (
