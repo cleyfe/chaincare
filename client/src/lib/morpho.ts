@@ -156,7 +156,7 @@ export class MorphoVault {
       if (!vault) {
         throw new Error('USDC vault not found in IPOR API response');
       }
-      return vault.apy;
+      return Number(vault.apy); // Ensure we return a number
     } catch (error) {
       console.error('Error fetching APY:', error);
       return 4.2; // Fallback APY if API call fails

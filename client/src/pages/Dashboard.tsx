@@ -75,7 +75,7 @@ export function Dashboard() {
         console.error("Error fetching APY:", error);
         return baseStats;
       }
-    }
+    },
   });
 
   const { data: userRewards } = useQuery<RewardsData>({
@@ -161,7 +161,7 @@ export function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <DepositModal 
+      <DepositModal
         isOpen={showDepositModal}
         onClose={() => setShowDepositModal(false)}
         amount={depositAmount}
@@ -196,7 +196,9 @@ export function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.interestRate?.toFixed(2)}%</div>
+            <div className="text-2xl font-bold">
+              {typeof stats?.interestRate === "number" ? `${stats.interestRate.toFixed(2)}%` : "0.00%"}
+            </div>
             <p className="text-xs text-muted-foreground">
               {formatUSD(stats?.totalInterest || 0)} generated
             </p>
