@@ -36,8 +36,11 @@ const ETH_TO_USD = 2000; // Fixed conversion rate for demonstration
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
   const [isDepositing, setIsDepositing] = useState(false);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [estimatedImpact, setEstimatedImpact] = useState<number>(0);
+  const [simulatedReturn, setSimulatedReturn] = useState<number>(0);
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
 
@@ -103,6 +106,58 @@ export function Dashboard() {
       });
     } finally {
       setIsDepositing(false);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (!window.ethereum || !withdrawAmount) {
+      return;
+    }
+
+    try {
+      setIsWithdrawing(true);
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const vault = new MorphoVault(provider);
+      const tx = await vault.withdraw(withdrawAmount);
+
+      toast({
+        title: "Withdrawal successful",
+        description: `Withdrawn ${formatUSD(parseFloat(withdrawAmount))} from the humanitarian fund`
+      });
+
+      setWithdrawAmount("");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Withdrawal failed",
+        description: error.message
+      });
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
+  const simulateImpact = async () => {
+    if (!depositAmount) {
+      return;
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const vault = new MorphoVault(provider);
+      const apy = await vault.getAPY();
+
+      // Calculate yearly return (50% of APY)
+      const yearlyReturn = parseFloat(depositAmount) * (apy / 100) * 0.5;
+      setSimulatedReturn(yearlyReturn);
+
+      // Calculate humanitarian impact (50% of APY)
+      const yearlyImpact = yearlyReturn; // Same as return since it's split 50/50
+      setEstimatedImpact(yearlyImpact);
+    } catch (error) {
+      console.error("Error calculating impact:", error);
+      setEstimatedImpact(0);
+      setSimulatedReturn(0);
     }
   };
 
@@ -249,6 +304,15 @@ export function Dashboard() {
                     className="max-w-[200px]"
                   />
                   <Button
+                    variant="secondary"
+                    onClick={simulateImpact}
+                    disabled={!depositAmount}
+                  >
+                    Simulate Impact
+                  </Button>
+                </div>
+                <div className="flex space-x-4 mt-4">
+                  <Button
                     onClick={handleDeposit}
                     disabled={!depositAmount || isDepositing}
                   >
@@ -272,8 +336,10 @@ export function Dashboard() {
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">Annual Return Rate</p>
-                      <p className="text-2xl font-bold text-primary">4.2% APY</p>
+                      <p className="text-sm text-muted-foreground">Your Annual Return</p>
+                      <p className="text-2xl font-bold text-primary">
+                        ${simulatedReturn.toFixed(2)}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Yearly Impact</p>
@@ -307,6 +373,34 @@ export function Dashboard() {
                 <li>3. Generated returns are automatically directed to verified humanitarian projects</li>
                 <li>4. Withdraw your initial deposit at any time, while the returns create lasting impact</li>
               </ol>
+            </div>
+
+            {/* Withdraw Section */}
+            <div className="border-t pt-6">
+              <h3 className="font-semibold mb-4">Withdraw Funds</h3>
+              <div className="flex space-x-4">
+                <Input
+                  type="number"
+                  placeholder="Amount to withdraw"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  className="max-w-[200px]"
+                />
+                <Button
+                  variant="outline"
+                  onClick={handleWithdraw}
+                  disabled={!withdrawAmount || isWithdrawing}
+                >
+                  {isWithdrawing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Withdrawing...
+                    </>
+                  ) : (
+                    "Withdraw"
+                  )}
+                </Button>
+              </div>
             </div>
 
             {/* Security Notice */}
