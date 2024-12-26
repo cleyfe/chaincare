@@ -196,7 +196,7 @@ export function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.interestRate}%</div>
+            <div className="text-2xl font-bold">{stats?.interestRate?.toFixed(2)}%</div>
             <p className="text-xs text-muted-foreground">
               {formatUSD(stats?.totalInterest || 0)} generated
             </p>
