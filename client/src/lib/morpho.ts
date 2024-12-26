@@ -14,8 +14,7 @@ const IPOR_VAULT_ABI = [
   "function totalAssets() external view returns (uint256)",
   "function convertToAssets(uint256 shares) external view returns (uint256)",
   "function convertToShares(uint256 assets) external view returns (uint256)",
-  "function getPricePerShare() external view returns (uint256)",
-  "function getAPY() external view returns (uint256)"
+  "function getPricePerShare() external view returns (uint256)"
 ];
 
 const IPOR_VAULT_ADDRESS = "0x45aa96f0b3188d47a1dafdbefce1db6b37f58216";
@@ -85,7 +84,7 @@ export class MorphoVault {
     const sig = ethers.Signature.from(signature);
 
     // Execute the permit
-    const tx = await usdcWithSigner.permit(
+    const permitTx = await usdcWithSigner.permit(
       address,
       IPOR_VAULT_ADDRESS,
       ethers.parseUnits(amount, 6),
@@ -95,7 +94,9 @@ export class MorphoVault {
       sig.s
     );
 
-    return tx;
+    // Wait for the permit transaction to be mined
+    const receipt = await permitTx.wait();
+    return receipt;
   }
 
   async deposit(amount: string) {
@@ -107,7 +108,10 @@ export class MorphoVault {
       ethers.parseUnits(amount, 6),
       address
     );
-    return await depositTx.wait();
+
+    // Wait for the deposit transaction to be mined
+    const receipt = await depositTx.wait();
+    return receipt;
   }
 
   async withdraw(assets: string) {
@@ -118,8 +122,9 @@ export class MorphoVault {
     // Convert amount to USDC decimals (6)
     const assetsInUSDC = ethers.parseUnits(assets, 6);
 
-    const tx = await vaultWithSigner.withdraw(assetsInUSDC, address, address);
-    return await tx.wait();
+    const withdrawTx = await vaultWithSigner.withdraw(assetsInUSDC, address, address);
+    const receipt = await withdrawTx.wait();
+    return receipt;
   }
 
   async getBalance(address: string) {
@@ -147,6 +152,7 @@ export class MorphoVault {
     const totalAssets = await this.vaultContract.totalAssets();
     return ethers.formatUnits(totalAssets, 6); // Format with USDC decimals
   }
+
   async estimateGas(amount: string) {
     const signer = await this.provider.getSigner();
     const address = await signer.getAddress();
