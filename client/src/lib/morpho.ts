@@ -95,9 +95,8 @@ export class MorphoVault {
       sig.s,
     );
 
-    // Wait for the permit transaction to be mined
-    const receipt = await permitTx.wait();
-    return receipt;
+    // Return the transaction instead of waiting for it
+    return permitTx;
   }
 
   async deposit(amount: string) {
@@ -110,9 +109,8 @@ export class MorphoVault {
       address,
     );
 
-    // Wait for the deposit transaction to be mined
-    const receipt = await depositTx.wait();
-    return receipt;
+    // Return the transaction instead of waiting for it
+    return depositTx;
   }
 
   async withdraw(assets: string) {
@@ -128,8 +126,9 @@ export class MorphoVault {
       address,
       address,
     );
-    const receipt = await withdrawTx.wait();
-    return receipt;
+
+    // Return the transaction instead of waiting for it
+    return withdrawTx;
   }
 
   async getBalance(address: string) {
