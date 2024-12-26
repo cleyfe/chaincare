@@ -22,16 +22,6 @@ import { ethers } from "ethers";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { DepositModal } from "@/components/ui/deposit-modal";
 
-interface RewardsData {
-  points: string;
-  level: string;
-  history: Array<{
-    amount: string;
-    reason: string;
-    timestamp: string;
-  }>;
-}
-
 interface Stats {
   totalDeposits: number;
   depositGrowth: number;
@@ -41,6 +31,16 @@ interface Stats {
   interestRate: number;
   totalDistributed: number;
   beneficiaries: number;
+}
+
+interface RewardsData {
+  points: string;
+  level: string;
+  history: Array<{
+    amount: string;
+    reason: string;
+    timestamp: string;
+  }>;
 }
 
 const ETH_TO_USD = 2000; // Fixed conversion rate for demonstration
@@ -55,8 +55,27 @@ export function Dashboard() {
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
 
+  // Fetch current APY for the stats
   const { data: stats, isLoading: isStatsLoading } = useQuery<Stats>({
     queryKey: ["/api/stats"],
+    queryFn: async () => {
+      const response = await fetch("/api/stats");
+      const baseStats = await response.json();
+
+      // Fetch real APY from IPOR API
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
+        const vault = new MorphoVault(provider);
+        const apy = await vault.getAPY();
+        return {
+          ...baseStats,
+          interestRate: apy, // Update with real APY
+        };
+      } catch (error) {
+        console.error("Error fetching APY:", error);
+        return baseStats;
+      }
+    }
   });
 
   const { data: userRewards } = useQuery<RewardsData>({
