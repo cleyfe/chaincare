@@ -35,25 +35,23 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
 
     try {
       setIsApproving(true);
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const vault = new MorphoVault(provider);
-      
-      // Convert amount to USDC decimals (6)
-      const amountInUSDC = ethers.parseUnits(amount, 6);
-      
+
       // Use permit for gasless approval
-      const tx = await vault.approveWithPermit(amountInUSDC.toString());
+      const tx = await vault.approveWithPermit(amount);
       await tx.wait();
 
       toast({
         title: "Approval successful",
-        description: "You can now deposit your USDC"
+        description: "You can now deposit your USDC into ChainCare"
       });
     } catch (error: any) {
+      console.error("Approval error:", error);
       toast({
         variant: "destructive",
         title: "Approval failed",
-        description: error.message
+        description: error.message || "Failed to approve USDC"
       });
     } finally {
       setIsApproving(false);
@@ -61,29 +59,27 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
   };
 
   const handleDeposit = async () => {
-    if (!window.ethereum) return;
+    if (!window.ethereum || !amount) return;
 
     try {
       setIsDepositing(true);
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const vault = new MorphoVault(provider);
-      
-      // Convert amount to USDC decimals (6)
-      const amountInUSDC = ethers.parseUnits(amount, 6);
-      
-      const tx = await vault.deposit(amountInUSDC.toString());
+
+      const tx = await vault.deposit(amount);
       await tx.wait();
 
       toast({
         title: "Deposit successful",
-        description: `Deposited ${amount} USDC into the humanitarian fund`
+        description: `Successfully deposited ${amount} USDC into ChainCare`
       });
       onClose();
     } catch (error: any) {
+      console.error("Deposit error:", error);
       toast({
         variant: "destructive",
         title: "Deposit failed",
-        description: error.message
+        description: error.message || "Failed to deposit USDC"
       });
     } finally {
       setIsDepositing(false);
@@ -94,7 +90,7 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Deposit Confirmation</DialogTitle>
+          <DialogTitle>Deposit into ChainCare</DialogTitle>
           <DialogDescription>
             You are about to deposit {amount} USDC into the humanitarian fund
           </DialogDescription>
@@ -103,6 +99,7 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
           <Button
             onClick={handleApprove}
             disabled={isApproving || isDepositing}
+            className="w-full"
           >
             {isApproving ? (
               <>
@@ -116,6 +113,7 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
           <Button
             onClick={handleDeposit}
             disabled={isApproving || isDepositing}
+            className="w-full"
           >
             {isDepositing ? (
               <>

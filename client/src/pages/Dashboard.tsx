@@ -16,7 +16,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MorphoVault } from "@/lib/morpho";
 import { ethers } from "ethers";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -71,12 +71,13 @@ export function Dashboard() {
     },
   });
 
-  const formatUSD = (ethAmount: number) => {
-    const usdAmount = ethAmount * ETH_TO_USD;
+  const formatUSD = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-    }).format(usdAmount);
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
   };
 
   const handleWithdraw = async () => {
@@ -92,7 +93,7 @@ export function Dashboard() {
 
       toast({
         title: "Withdrawal successful",
-        description: `Withdrawn ${formatUSD(parseFloat(withdrawAmount))} from the humanitarian fund`,
+        description: `Withdrawn ${formatUSD(parseFloat(withdrawAmount))} from ChainCare`,
       });
 
       setWithdrawAmount("");
@@ -108,47 +109,27 @@ export function Dashboard() {
   };
 
   const simulateImpact = async () => {
-    if (!depositAmount) {
+    if (!depositAmount || isNaN(parseFloat(depositAmount))) {
+      setSimulatedReturn(0);
+      setEstimatedImpact(0);
       return;
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const vault = new MorphoVault(provider);
-      const apy = await vault.getAPY();
+      const amount = parseFloat(depositAmount);
+      // Fixed APY for demonstration - in production this would come from the contract
+      const apy = 4.2; // 4.2%
+      const yearlyTotal = amount * (apy / 100);
 
-      const yearlyTotal = parseFloat(depositAmount) * (apy / 100);
       // Split returns 50/50 between user and humanitarian impact
       setSimulatedReturn(yearlyTotal / 2);
       setEstimatedImpact(yearlyTotal / 2);
     } catch (error) {
       console.error("Error calculating impact:", error);
-      setEstimatedImpact(0);
       setSimulatedReturn(0);
+      setEstimatedImpact(0);
     }
   };
-
-  useEffect(() => {
-    const calculateImpact = async () => {
-      if (!depositAmount) {
-        setEstimatedImpact(0);
-        return;
-      }
-
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum as any);
-        const vault = new MorphoVault(provider);
-        const apy = await vault.getAPY();
-        const yearlyReturn = parseFloat(depositAmount) * (apy / 100);
-        setEstimatedImpact(yearlyReturn);
-      } catch (error) {
-        console.error("Error calculating impact:", error);
-        setEstimatedImpact(0);
-      }
-    };
-
-    calculateImpact();
-  }, [depositAmount]);
 
   if (isStatsLoading) {
     return (
@@ -166,7 +147,7 @@ export function Dashboard() {
         amount={depositAmount}
       />
       <div>
-        <h1 className="text-3xl font-bold mb-2">Humanitarian Impact Fund</h1>
+        <h1 className="text-3xl font-bold mb-2">ChainCare Humanitarian Fund</h1>
         <p className="text-muted-foreground">
           Make a difference through sustainable impact investing
         </p>
@@ -176,9 +157,7 @@ export function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Deposits
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Deposits</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -206,9 +185,7 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Aid Distributed
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Aid Distributed</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -281,13 +258,17 @@ export function Dashboard() {
                     type="number"
                     placeholder="Amount in USDC"
                     value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
+                    onChange={(e) => {
+                      setDepositAmount(e.target.value);
+                      setSimulatedReturn(0);
+                      setEstimatedImpact(0);
+                    }}
                     className="max-w-[200px]"
                   />
                   <Button
                     variant="secondary"
                     onClick={simulateImpact}
-                    disabled={!depositAmount}
+                    disabled={!depositAmount || isNaN(parseFloat(depositAmount))}
                   >
                     Simulate Impact
                   </Button>
@@ -303,7 +284,7 @@ export function Dashboard() {
                         Your Annual Return
                       </p>
                       <p className="text-2xl font-bold text-primary">
-                        ${simulatedReturn.toFixed(2)}
+                        {formatUSD(simulatedReturn)}
                       </p>
                     </div>
                     <div>
@@ -311,7 +292,7 @@ export function Dashboard() {
                         Yearly Impact
                       </p>
                       <p className="text-2xl font-bold text-primary">
-                        ${estimatedImpact.toFixed(2)}
+                        {formatUSD(estimatedImpact)}
                       </p>
                     </div>
                   </div>
@@ -397,37 +378,6 @@ export function Dashboard() {
                 aid.
               </p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Impact Journey</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {userRewards?.history?.map((item: any, i: number) => (
-              <div key={i} className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{item.reason}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(item.timestamp).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">
-                    +{parseInt(item.amount).toLocaleString()} pts
-                  </p>
-                </div>
-              </div>
-            ))}
-            {(!userRewards?.history || userRewards.history.length === 0) && (
-              <p className="text-muted-foreground text-center py-4">
-                Make your first deposit to start your impact journey!
-              </p>
-            )}
           </div>
         </CardContent>
       </Card>
