@@ -5,6 +5,8 @@ const IPOR_VAULT_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
   "function allowance(address owner, address spender) external view returns (uint256)",
   "function balanceOf(address account) external view returns (uint256)",
+  // Permit functionality
+  "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)",
   // Vault specific functions from the contract
   "function deposit(uint256 assets, address receiver) external returns (uint256)",
   "function withdraw(uint256 assets, address receiver, address owner) external returns (uint256)",
@@ -33,27 +35,77 @@ export class MorphoVault {
     );
     this.usdcContract = new ethers.Contract(
       USDC_ADDRESS,
-      ["function approve(address spender, uint256 amount) external returns (bool)"],
+      [
+        "function approve(address spender, uint256 amount) external returns (bool)",
+        "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)",
+        "function nonces(address owner) external view returns (uint256)"
+      ],
       provider
     );
   }
 
-  async deposit(amount: string) {
+  async approveWithPermit(amount: string) {
     const signer = await this.provider.getSigner();
     const usdcWithSigner = this.usdcContract.connect(signer);
-    const vaultWithSigner = this.vaultContract.connect(signer);
+    const address = await signer.getAddress();
 
-    // First approve USDC spend
-    const approvalTx = await usdcWithSigner.approve(
+    // Get the current nonce
+    const nonce = await this.usdcContract.nonces(address);
+
+    // Set deadline to 1 hour from now
+    const deadline = Math.floor(Date.now() / 1000) + 3600;
+
+    // Generate the permit signature
+    const domain = {
+      name: 'USD Coin',
+      version: '2',
+      chainId: (await this.provider.getNetwork()).chainId,
+      verifyingContract: USDC_ADDRESS
+    };
+
+    const types = {
+      Permit: [
+        { name: 'owner', type: 'address' },
+        { name: 'spender', type: 'address' },
+        { name: 'value', type: 'uint256' },
+        { name: 'nonce', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' }
+      ]
+    };
+
+    const message = {
+      owner: address,
+      spender: IPOR_VAULT_ADDRESS,
+      value: ethers.parseUnits(amount, 6),
+      nonce: nonce,
+      deadline
+    };
+
+    const signature = await signer.signTypedData(domain, types, message);
+    const { v, r, s } = ethers.utils.splitSignature(signature);
+
+    // Execute the permit
+    const tx = await usdcWithSigner.permit(
+      address,
       IPOR_VAULT_ADDRESS,
-      ethers.parseEther(amount)
+      ethers.parseUnits(amount, 6),
+      deadline,
+      v,
+      r,
+      s
     );
-    await approvalTx.wait();
 
-    // Then deposit into vault
+    return tx;
+  }
+
+  async deposit(amount: string) {
+    const signer = await this.provider.getSigner();
+    const vaultWithSigner = this.vaultContract.connect(signer);
+    const address = await signer.getAddress();
+
     const depositTx = await vaultWithSigner.deposit(
-      ethers.parseEther(amount),
-      await signer.getAddress()
+      ethers.parseUnits(amount, 6),
+      address
     );
     return await depositTx.wait();
   }
@@ -63,8 +115,11 @@ export class MorphoVault {
     const vaultWithSigner = this.vaultContract.connect(signer);
     const address = await signer.getAddress();
 
+    // Convert amount to USDC decimals (6)
+    const assetsInUSDC = ethers.parseUnits(assets, 6);
+
     const tx = await vaultWithSigner.withdraw(
-      ethers.parseEther(assets),
+      assetsInUSDC,
       address,
       address
     );
@@ -73,12 +128,12 @@ export class MorphoVault {
 
   async getBalance(address: string) {
     const balance = await this.vaultContract.balanceOf(address);
-    return ethers.formatEther(balance);
+    return ethers.formatUnits(balance, 6); // Format with USDC decimals
   }
 
   async getPricePerShare() {
     const price = await this.vaultContract.getPricePerShare();
-    return ethers.formatEther(price);
+    return ethers.formatUnits(price, 6); // Format with USDC decimals
   }
 
   async getAPY() {
@@ -88,14 +143,13 @@ export class MorphoVault {
 
   async getMaxDeposit(address: string) {
     const maxDeposit = await this.vaultContract.maxDeposit(address);
-    return ethers.formatEther(maxDeposit);
+    return ethers.formatUnits(maxDeposit, 6); // Format with USDC decimals
   }
 
   async getTotalAssets() {
     const totalAssets = await this.vaultContract.totalAssets();
-    return ethers.formatEther(totalAssets);
+    return ethers.formatUnits(totalAssets, 6); // Format with USDC decimals
   }
-
   async estimateGas(amount: string) {
     const signer = await this.provider.getSigner();
     const address = await signer.getAddress();
@@ -103,12 +157,12 @@ export class MorphoVault {
     // Estimate gas for approval
     const approvalGas = await this.usdcContract.approve.estimateGas(
       IPOR_VAULT_ADDRESS, 
-      ethers.parseEther(amount)
+      ethers.parseUnits(amount, 6)
     );
 
     // Estimate gas for deposit
     const depositGas = await this.vaultContract.deposit.estimateGas(
-      ethers.parseEther(amount),
+      ethers.parseUnits(amount, 6),
       address
     );
 

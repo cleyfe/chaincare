@@ -10,6 +10,7 @@ import { initWeb3, getAccount } from "@/lib/web3";
 import { MorphoVault } from "@/lib/morpho";
 import { ethers } from "ethers";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
+import { DepositModal } from "@/components/ui/deposit-modal";
 
 interface RewardsData {
   points: string;
@@ -37,10 +38,10 @@ const ETH_TO_USD = 2000; // Fixed conversion rate for demonstration
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [isDepositing, setIsDepositing] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [estimatedImpact, setEstimatedImpact] = useState<number>(0);
   const [simulatedReturn, setSimulatedReturn] = useState<number>(0);
+  const [showDepositModal, setShowDepositModal] = useState(false);
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
 
@@ -66,48 +67,6 @@ export function Dashboard() {
     }).format(usdAmount);
   };
 
-  const handleDeposit = async () => {
-    if (!window.ethereum) {
-      toast({
-        variant: "destructive",
-        title: "Wallet not found",
-        description: "Please install a Web3 wallet like MetaMask"
-      });
-      return;
-    }
-
-    try {
-      setIsDepositing(true);
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const vault = new MorphoVault(provider);
-      const tx = await vault.deposit(depositAmount);
-
-      await fetch("/api/deposits", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          walletAddress: primaryWallet?.address,
-          amount: depositAmount,
-          txHash: tx.hash
-        })
-      });
-
-      toast({
-        title: "Deposit successful",
-        description: `Deposited ${formatUSD(parseFloat(depositAmount))} into the humanitarian fund`
-      });
-
-      setDepositAmount("");
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Deposit failed",
-        description: error.message
-      });
-    } finally {
-      setIsDepositing(false);
-    }
-  };
 
   const handleWithdraw = async () => {
     if (!window.ethereum || !withdrawAmount) {
@@ -147,13 +106,10 @@ export function Dashboard() {
       const vault = new MorphoVault(provider);
       const apy = await vault.getAPY();
 
-      // Calculate yearly return (50% of APY)
-      const yearlyReturn = parseFloat(depositAmount) * (apy / 100) * 0.5;
-      setSimulatedReturn(yearlyReturn);
-
-      // Calculate humanitarian impact (50% of APY)
-      const yearlyImpact = yearlyReturn; // Same as return since it's split 50/50
-      setEstimatedImpact(yearlyImpact);
+      const yearlyTotal = parseFloat(depositAmount) * (apy / 100);
+      // Split returns 50/50 between user and humanitarian impact
+      setSimulatedReturn(yearlyTotal / 2);
+      setEstimatedImpact(yearlyTotal / 2);
     } catch (error) {
       console.error("Error calculating impact:", error);
       setEstimatedImpact(0);
@@ -182,7 +138,6 @@ export function Dashboard() {
 
     calculateImpact();
   }, [depositAmount]);
-
 
   if (isStatsLoading) {
     return (
@@ -298,7 +253,7 @@ export function Dashboard() {
                 <div className="flex space-x-4">
                   <Input
                     type="number"
-                    placeholder="Amount in USD"
+                    placeholder="Amount in USDC"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
                     className="max-w-[200px]"
@@ -309,24 +264,6 @@ export function Dashboard() {
                     disabled={!depositAmount}
                   >
                     Simulate Impact
-                  </Button>
-                </div>
-                <div className="flex space-x-4 mt-4">
-                  <Button
-                    onClick={handleDeposit}
-                    disabled={!depositAmount || isDepositing}
-                  >
-                    {isDepositing ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Depositing...
-                      </>
-                    ) : (
-                      <>
-                        <Coins className="mr-2 h-4 w-4" />
-                        Secure Deposit
-                      </>
-                    )}
                   </Button>
                 </div>
               </div>
@@ -349,6 +286,16 @@ export function Dashboard() {
                     </div>
                   </div>
                 </div>
+
+                {/* Deposit Button */}
+                <Button
+                  onClick={() => setShowDepositModal(true)}
+                  disabled={!depositAmount || !estimatedImpact}
+                  className="w-full"
+                >
+                  <Coins className="mr-2 h-4 w-4" />
+                  Secure Deposit
+                </Button>
               </div>
             </div>
 
