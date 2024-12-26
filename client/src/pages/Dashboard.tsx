@@ -1,7 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, TrendingUp, Users, DollarSign, Coins, Trophy, ShieldCheck, Lock, Eye, Info } from "lucide-react";
+import {
+  Loader2,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Coins,
+  Trophy,
+  ShieldCheck,
+  Lock,
+  Eye,
+  Info,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -46,27 +57,28 @@ export function Dashboard() {
   const { toast } = useToast();
 
   const { data: stats, isLoading: isStatsLoading } = useQuery<Stats>({
-    queryKey: ["/api/stats"]
+    queryKey: ["/api/stats"],
   });
 
   const { data: userRewards } = useQuery<RewardsData>({
-    queryKey: [primaryWallet?.address ? `/api/rewards/${primaryWallet.address}` : null],
+    queryKey: [
+      primaryWallet?.address ? `/api/rewards/${primaryWallet.address}` : null,
+    ],
     enabled: !!primaryWallet?.address,
     initialData: {
       points: "0",
       level: "Bronze",
-      history: []
-    }
+      history: [],
+    },
   });
 
   const formatUSD = (ethAmount: number) => {
     const usdAmount = ethAmount * ETH_TO_USD;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(usdAmount);
   };
-
 
   const handleWithdraw = async () => {
     if (!window.ethereum || !withdrawAmount) {
@@ -81,7 +93,7 @@ export function Dashboard() {
 
       toast({
         title: "Withdrawal successful",
-        description: `Withdrawn ${formatUSD(parseFloat(withdrawAmount))} from the humanitarian fund`
+        description: `Withdrawn ${formatUSD(parseFloat(withdrawAmount))} from the humanitarian fund`,
       });
 
       setWithdrawAmount("");
@@ -89,7 +101,7 @@ export function Dashboard() {
       toast({
         variant: "destructive",
         title: "Withdrawal failed",
-        description: error.message
+        description: error.message,
       });
     } finally {
       setIsWithdrawing(false);
@@ -149,6 +161,11 @@ export function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <DepositModal 
+        isOpen={showDepositModal}
+        onClose={() => setShowDepositModal(false)}
+        amount={depositAmount}
+      />
       <div>
         <h1 className="text-3xl font-bold mb-2">Humanitarian Impact Fund</h1>
         <p className="text-muted-foreground">
@@ -160,11 +177,15 @@ export function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Deposits</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Deposits
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatUSD(stats?.totalDeposits || 0)}</div>
+            <div className="text-2xl font-bold">
+              {formatUSD(stats?.totalDeposits || 0)}
+            </div>
             <p className="text-xs text-muted-foreground">
               +{stats?.depositGrowth.toFixed(2)}% from last month
             </p>
@@ -186,11 +207,15 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aid Distributed</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Aid Distributed
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatUSD(stats?.totalDistributed || 0)}</div>
+            <div className="text-2xl font-bold">
+              {formatUSD(stats?.totalDistributed || 0)}
+            </div>
             <p className="text-xs text-muted-foreground">
               To {stats?.beneficiaries} beneficiaries
             </p>
@@ -203,7 +228,9 @@ export function Dashboard() {
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{parseInt(userRewards?.points || "0").toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {parseInt(userRewards?.points || "0").toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               {userRewards?.level || "Bronze"} Level
             </p>
@@ -273,13 +300,17 @@ export function Dashboard() {
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">Your Annual Return</p>
+                      <p className="text-sm text-muted-foreground">
+                        Your Annual Return
+                      </p>
                       <p className="text-2xl font-bold text-primary">
                         ${simulatedReturn.toFixed(2)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Yearly Impact</p>
+                      <p className="text-sm text-muted-foreground">
+                        Yearly Impact
+                      </p>
                       <p className="text-2xl font-bold text-primary">
                         ${estimatedImpact.toFixed(2)}
                       </p>
@@ -303,22 +334,30 @@ export function Dashboard() {
             <div className="bg-muted/30 p-4 rounded-lg">
               <h3 className="font-semibold mb-2">How It Works</h3>
               <ol className="space-y-2 text-sm text-muted-foreground">
-                <li>1. Your deposit is securely held in a{' '}
+                <li>
+                  1. Your deposit is securely held in a{" "}
                   <InfoTooltip
                     term="non-custodial smart contract"
                     description="A secure, automated program that holds your funds while maintaining your full control."
                     link="/faq#smart-contracts"
                   />
                 </li>
-                <li>2. Funds generate yield through established{' '}
+                <li>
+                  2. Funds generate yield through established{" "}
                   <InfoTooltip
                     term="DeFi lending protocols"
                     description="Decentralized platforms that facilitate lending and borrowing of digital assets to generate returns."
                     link="/faq#lending-protocols"
                   />
                 </li>
-                <li>3. Generated returns are automatically directed to verified humanitarian projects</li>
-                <li>4. Withdraw your initial deposit at any time, while the returns create lasting impact</li>
+                <li>
+                  3. Generated returns are automatically directed to verified
+                  humanitarian projects
+                </li>
+                <li>
+                  4. Withdraw your initial deposit at any time, while the
+                  returns create lasting impact
+                </li>
               </ol>
             </div>
 
@@ -354,7 +393,9 @@ export function Dashboard() {
             <div className="text-sm text-muted-foreground">
               <p className="flex items-center gap-2">
                 <Info className="h-4 w-4" />
-                Your deposit remains under your control and can be withdrawn at any time. Only the generated returns are used for humanitarian aid.
+                Your deposit remains under your control and can be withdrawn at
+                any time. Only the generated returns are used for humanitarian
+                aid.
               </p>
             </div>
           </div>
@@ -377,7 +418,9 @@ export function Dashboard() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">+{parseInt(item.amount).toLocaleString()} pts</p>
+                  <p className="font-medium">
+                    +{parseInt(item.amount).toLocaleString()} pts
+                  </p>
                 </div>
               </div>
             ))}
