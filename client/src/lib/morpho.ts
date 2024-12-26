@@ -19,6 +19,7 @@ const IPOR_VAULT_ABI = [
 
 const IPOR_VAULT_ADDRESS = "0x45aa96f0b3188d47a1dafdbefce1db6b37f58216";
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+const IPOR_API_URL = "https://api.ipor.io/fusion/vaults";
 
 export class MorphoVault {
   private vaultContract: ethers.Contract;
@@ -137,10 +138,22 @@ export class MorphoVault {
     return ethers.formatUnits(price, 6); // Format with USDC decimals
   }
 
-  async getAPY() {
-    //const apy = await this.vaultContract.getAPY();
-    const apy = 4.2;
-    return Number(apy) / 100; // Convert basis points to percentage
+  async getAPY(): Promise<number> {
+    try {
+      const response = await fetch(IPOR_API_URL);
+      if (!response.ok) {
+        throw new Error('Failed to fetch APY from IPOR API');
+      }
+      const data = await response.json();
+      const vault = data.find((v: any) => v.name === "IPOR USDC Lending Optimizer Base");
+      if (!vault) {
+        throw new Error('USDC vault not found in IPOR API response');
+      }
+      return vault.apy;
+    } catch (error) {
+      console.error('Error fetching APY:', error);
+      return 4.2; // Fallback APY if API call fails
+    }
   }
 
   async getMaxDeposit(address: string) {

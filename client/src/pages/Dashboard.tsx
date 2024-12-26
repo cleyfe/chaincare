@@ -117,8 +117,9 @@ export function Dashboard() {
 
     try {
       const amount = parseFloat(depositAmount);
-      // Fixed APY for demonstration - in production this would come from the contract
-      const apy = 4.2; // 4.2%
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
+      const vault = new MorphoVault(provider);
+      const apy = await vault.getAPY();
       const yearlyTotal = amount * (apy / 100);
 
       // Split returns 50/50 between user and humanitarian impact
