@@ -17,7 +17,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
-import { initWeb3, getAccount } from "@/lib/web3";
 import { MorphoVault } from "@/lib/morpho";
 import { ethers } from "ethers";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -87,7 +86,7 @@ export function Dashboard() {
 
     try {
       setIsWithdrawing(true);
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const vault = new MorphoVault(provider);
       const tx = await vault.withdraw(withdrawAmount);
 
@@ -114,7 +113,7 @@ export function Dashboard() {
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const vault = new MorphoVault(provider);
       const apy = await vault.getAPY();
 
@@ -137,7 +136,7 @@ export function Dashboard() {
       }
 
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         const vault = new MorphoVault(provider);
         const apy = await vault.getAPY();
         const yearlyReturn = parseFloat(depositAmount) * (apy / 100);

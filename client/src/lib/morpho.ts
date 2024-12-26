@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 
 const IPOR_VAULT_ABI = [
   // Core ERC20 functions needed for approve + deposit
@@ -15,7 +15,7 @@ const IPOR_VAULT_ABI = [
   "function convertToAssets(uint256 shares) external view returns (uint256)",
   "function convertToShares(uint256 assets) external view returns (uint256)",
   "function getPricePerShare() external view returns (uint256)",
-  "function getAPY() external view returns (uint256)",
+  "function getAPY() external view returns (uint256)"
 ];
 
 const IPOR_VAULT_ADDRESS = "0x45aa96f0b3188d47a1dafdbefce1db6b37f58216";
@@ -31,16 +31,16 @@ export class MorphoVault {
     this.vaultContract = new ethers.Contract(
       IPOR_VAULT_ADDRESS,
       IPOR_VAULT_ABI,
-      provider,
+      provider
     );
     this.usdcContract = new ethers.Contract(
       USDC_ADDRESS,
       [
         "function approve(address spender, uint256 amount) external returns (bool)",
         "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)",
-        "function nonces(address owner) external view returns (uint256)",
+        "function nonces(address owner) external view returns (uint256)"
       ],
-      provider,
+      provider
     );
   }
 
@@ -57,20 +57,20 @@ export class MorphoVault {
 
     // Generate the permit signature
     const domain = {
-      name: "USD Coin",
-      version: "2",
+      name: 'USD Coin',
+      version: '2',
       chainId: (await this.provider.getNetwork()).chainId,
-      verifyingContract: USDC_ADDRESS,
+      verifyingContract: USDC_ADDRESS
     };
 
     const types = {
       Permit: [
-        { name: "owner", type: "address" },
-        { name: "spender", type: "address" },
-        { name: "value", type: "uint256" },
-        { name: "nonce", type: "uint256" },
-        { name: "deadline", type: "uint256" },
-      ],
+        { name: 'owner', type: 'address' },
+        { name: 'spender', type: 'address' },
+        { name: 'value', type: 'uint256' },
+        { name: 'nonce', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' }
+      ]
     };
 
     const message = {
@@ -78,11 +78,11 @@ export class MorphoVault {
       spender: IPOR_VAULT_ADDRESS,
       value: ethers.parseUnits(amount, 6),
       nonce: nonce,
-      deadline,
+      deadline
     };
 
     const signature = await signer.signTypedData(domain, types, message);
-    const { v, r, s } = ethers.utils.splitSignature(signature);
+    const sig = ethers.Signature.from(signature);
 
     // Execute the permit
     const tx = await usdcWithSigner.permit(
@@ -90,9 +90,9 @@ export class MorphoVault {
       IPOR_VAULT_ADDRESS,
       ethers.parseUnits(amount, 6),
       deadline,
-      v,
-      r,
-      s,
+      sig.v,
+      sig.r,
+      sig.s
     );
 
     return tx;
@@ -105,7 +105,7 @@ export class MorphoVault {
 
     const depositTx = await vaultWithSigner.deposit(
       ethers.parseUnits(amount, 6),
-      address,
+      address
     );
     return await depositTx.wait();
   }
@@ -154,13 +154,13 @@ export class MorphoVault {
     // Estimate gas for approval
     const approvalGas = await this.usdcContract.approve.estimateGas(
       IPOR_VAULT_ADDRESS,
-      ethers.parseUnits(amount, 6),
+      ethers.parseUnits(amount, 6)
     );
 
     // Estimate gas for deposit
     const depositGas = await this.vaultContract.deposit.estimateGas(
       ethers.parseUnits(amount, 6),
-      address,
+      address
     );
 
     return {
