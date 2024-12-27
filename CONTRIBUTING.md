@@ -68,7 +68,7 @@ Enhancement suggestions are tracked as GitHub issues. When you are creating an e
 ### Documentation Styleguide
 
 * Use Markdown
-* Reference functions and classes in backticks: \`functionName()\`
+* Reference functions and classes in backticks: `functionName()`
 * Include code examples when possible
 * Keep line length to 80 characters or less
 
@@ -87,4 +87,4 @@ This section lists the labels we use to help us track and manage issues and pull
 
 ## License
 
-By contributing to ChainCare, you agree that your contributions will be licensed under its MIT License.
+By contributing to ChainCare, you agree that your contributions will be licensed under the GNU Affero General Public License v3.0.
