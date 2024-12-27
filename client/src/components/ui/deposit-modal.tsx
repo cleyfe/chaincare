@@ -23,12 +23,27 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
   const [isDepositing, setIsDepositing] = useState(false);
   const { toast } = useToast();
 
+  // Input validation
+  const validateAmount = (amount: string): boolean => {
+    const numAmount = parseFloat(amount);
+    return !isNaN(numAmount) && numAmount > 0 && numAmount <= 1000000; // Max 1M USDC
+  };
+
   const handleApprove = async () => {
     if (!window.ethereum) {
       toast({
         variant: "destructive",
         title: "Wallet not found",
         description: "Please install a Web3 wallet like MetaMask"
+      });
+      return;
+    }
+
+    if (!validateAmount(amount)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid amount",
+        description: "Please enter a valid amount between 0 and 1,000,000 USDC"
       });
       return;
     }
@@ -60,6 +75,15 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
 
   const handleDeposit = async () => {
     if (!window.ethereum || !amount) return;
+
+    if (!validateAmount(amount)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid amount",
+        description: "Please enter a valid amount between 0 and 1,000,000 USDC"
+      });
+      return;
+    }
 
     try {
       setIsDepositing(true);

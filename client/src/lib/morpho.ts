@@ -1,5 +1,11 @@
+/**
+ * Interface with IPOR USDC Vault on Base network for deposits and withdrawals.
+ * Handles USDC transactions and permit functionality for gasless approvals.
+ */
+
 import { ethers } from "ethers";
 
+// Core ERC20 and vault functionality
 const IPOR_VAULT_ABI = [
   // Core ERC20 functions needed for approve + deposit
   "function approve(address spender, uint256 amount) external returns (bool)",
@@ -17,6 +23,7 @@ const IPOR_VAULT_ABI = [
   "function getPricePerShare() external view returns (uint256)",
 ];
 
+// Contract addresses on Base network
 const IPOR_VAULT_ADDRESS = "0x45aa96f0b3188d47a1dafdbefce1db6b37f58216";
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const IPOR_API_URL = "https://api.ipor.io/fusion/vaults";
@@ -44,7 +51,12 @@ export class MorphoVault {
     );
   }
 
-  async approveWithPermit(amount: string) {
+  /**
+   * Approve USDC spending using permit signature (gasless)
+   * @param amount - Amount of USDC to approve (in decimal form)
+   * @returns Transaction object for the permit
+   */
+  async approveWithPermit(amount: string): Promise<ethers.ContractTransactionResponse> {
     const signer = await this.provider.getSigner();
     const usdcWithSigner = this.usdcContract.connect(signer);
     const address = await signer.getAddress();
@@ -85,7 +97,7 @@ export class MorphoVault {
     const sig = ethers.Signature.from(signature);
 
     // Execute the permit
-    const permitTx = await usdcWithSigner.permit(
+    return usdcWithSigner.permit(
       address,
       IPOR_VAULT_ADDRESS,
       ethers.parseUnits(amount, 6),
@@ -94,26 +106,30 @@ export class MorphoVault {
       sig.r,
       sig.s,
     );
-
-    // Return the transaction instead of waiting for it
-    return permitTx;
   }
 
-  async deposit(amount: string) {
+  /**
+   * Deposit USDC into the IPOR vault
+   * @param amount - Amount of USDC to deposit (in decimal form)
+   * @returns Transaction object for the deposit
+   */
+  async deposit(amount: string): Promise<ethers.ContractTransactionResponse> {
     const signer = await this.provider.getSigner();
     const vaultWithSigner = this.vaultContract.connect(signer);
     const address = await signer.getAddress();
 
-    const depositTx = await vaultWithSigner.deposit(
+    return vaultWithSigner.deposit(
       ethers.parseUnits(amount, 6),
       address,
     );
-
-    // Return the transaction instead of waiting for it
-    return depositTx;
   }
 
-  async withdraw(assets: string) {
+  /**
+   * Withdraw USDC from the IPOR vault
+   * @param assets - Amount of USDC to withdraw (in decimal form)
+   * @returns Transaction object for the withdrawal
+   */
+  async withdraw(assets: string): Promise<ethers.ContractTransactionResponse> {
     const signer = await this.provider.getSigner();
     const vaultWithSigner = this.vaultContract.connect(signer);
     const address = await signer.getAddress();
@@ -121,26 +137,36 @@ export class MorphoVault {
     // Convert amount to USDC decimals (6)
     const assetsInUSDC = ethers.parseUnits(assets, 6);
 
-    const withdrawTx = await vaultWithSigner.withdraw(
+    return vaultWithSigner.withdraw(
       assetsInUSDC,
       address,
       address,
     );
-
-    // Return the transaction instead of waiting for it
-    return withdrawTx;
   }
 
-  async getBalance(address: string) {
+  /**
+   * Get vault share balance for an address
+   * @param address - Ethereum address to check
+   * @returns Balance in decimal form
+   */
+  async getBalance(address: string): Promise<string> {
     const balance = await this.vaultContract.balanceOf(address);
     return ethers.formatUnits(balance, 6); // Format with USDC decimals
   }
 
-  async getPricePerShare() {
+  /**
+   * Get current price per share in the vault
+   * @returns Price per share in decimal form
+   */
+  async getPricePerShare(): Promise<string> {
     const price = await this.vaultContract.getPricePerShare();
     return ethers.formatUnits(price, 6); // Format with USDC decimals
   }
 
+  /**
+   * Get current APY from IPOR API
+   * @returns Current APY as a number
+   */
   async getAPY(): Promise<number> {
     try {
       const response = await fetch(IPOR_API_URL);
@@ -148,7 +174,6 @@ export class MorphoVault {
         throw new Error('Failed to fetch APY from IPOR API');
       }
       const data = await response.json();
-      console.log(data); // Log the API response for debugging
       const vault = data.vaults.find(
         (v: any) => v.name === "IPOR USDC Lending Optimizer Base",
       );
@@ -162,17 +187,35 @@ export class MorphoVault {
     }
   }
 
-  async getMaxDeposit(address: string) {
+  /**
+   * Get maximum deposit amount allowed for an address
+   * @param address - Ethereum address to check
+   * @returns Maximum deposit amount in decimal form
+   */
+  async getMaxDeposit(address: string): Promise<string> {
     const maxDeposit = await this.vaultContract.maxDeposit(address);
     return ethers.formatUnits(maxDeposit, 6); // Format with USDC decimals
   }
 
-  async getTotalAssets() {
+  /**
+   * Get total assets in the vault
+   * @returns Total assets in decimal form
+   */
+  async getTotalAssets(): Promise<string> {
     const totalAssets = await this.vaultContract.totalAssets();
     return ethers.formatUnits(totalAssets, 6); // Format with USDC decimals
   }
 
-  async estimateGas(amount: string) {
+  /**
+   * Estimate gas needed for approval and deposit
+   * @param amount - Amount of USDC (in decimal form)
+   * @returns Gas estimates for approval and deposit
+   */
+  async estimateGas(amount: string): Promise<{
+    approval: bigint;
+    deposit: bigint;
+    total: bigint;
+  }> {
     const signer = await this.provider.getSigner();
     const address = await signer.getAddress();
 

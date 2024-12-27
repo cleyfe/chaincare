@@ -61,6 +61,11 @@ function AuthenticatedApp() {
     );
   }
 
+  // Only show dashboard if user is explicitly on the dashboard route
+  if (location === "/dashboard" && !isLoggedIn) {
+    return <ConnectWallet />;
+  }
+
   return (
     <>
       <Switch>
