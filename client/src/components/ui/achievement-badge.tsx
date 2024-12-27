@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ShareButton } from "@/components/ui/share-button";
 
 interface AchievementBadgeProps {
   name: string;
@@ -52,6 +53,14 @@ export function AchievementBadge({
             </span>
           )}
         </div>
+        {isEarned && (
+          <div className="mt-4">
+            <ShareButton
+              title={`I earned the ${name} badge on ChainCare! 🏆`}
+              text={`I just earned the ${name} badge for ${description.toLowerCase()}. Join me in making a difference through sustainable impact investing!`}
+            />
+          </div>
+        )}
       </div>
     </Card>
   );
