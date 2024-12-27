@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { MorphoVault } from "@/lib/morpho";
+import { ExecutionVault } from "@/lib/morpho";
 import { ethers } from "ethers";
 
 interface DepositModalProps {
@@ -51,7 +51,7 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
     try {
       setIsApproving(true);
       const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const vault = new MorphoVault(provider);
+      const vault = new ExecutionVault(provider);
 
       // Use permit for gasless approval
       const tx = await vault.approveWithPermit(amount);
@@ -88,7 +88,7 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
     try {
       setIsDepositing(true);
       const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const vault = new MorphoVault(provider);
+      const vault = new ExecutionVault(provider);
 
       const tx = await vault.deposit(amount);
       await tx.wait();

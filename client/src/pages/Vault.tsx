@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle } from "lucide-react";
 import { initWeb3, getAccount } from "@/lib/web3";
-import { MorphoVault } from "@/lib/morpho";
+import { ExecutionVault } from "@/lib/morpho";
 import { ethers } from "ethers";
 import type { VaultDeposit, Stats } from "@/types/api";
 
@@ -33,7 +33,7 @@ export function Vault() {
       const account = await getAccount();
 
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const vault = new MorphoVault(provider);
+      const vault = new ExecutionVault(provider);
 
       const tx = await vault.deposit(depositAmount);
 
@@ -72,7 +72,7 @@ export function Vault() {
       const account = await getAccount();
 
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const vault = new MorphoVault(provider);
+      const vault = new ExecutionVault(provider);
 
       const tx = await vault.withdraw(withdrawAmount);
 
@@ -121,8 +121,8 @@ export function Vault() {
                   onChange={(e) => setDepositAmount(e.target.value)}
                 />
               </div>
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 onClick={handleDeposit}
                 disabled={!depositAmount || isDepositing}
               >
@@ -146,7 +146,7 @@ export function Vault() {
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                 />
               </div>
-              <Button 
+              <Button
                 className="w-full"
                 onClick={handleWithdraw}
                 disabled={!withdrawAmount || isWithdrawing}

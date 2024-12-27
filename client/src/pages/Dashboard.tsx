@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState } from "react";
-import { MorphoVault } from "@/lib/morpho";
+import { ExecutionVault } from "@/lib/morpho";
 import { ethers } from "ethers";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { DepositModal } from "@/components/ui/deposit-modal";
@@ -65,7 +65,7 @@ export function Dashboard() {
       // Fetch real APY from IPOR API
       try {
         const provider = new ethers.BrowserProvider(window.ethereum as any);
-        const vault = new MorphoVault(provider);
+        const vault = new ExecutionVault(provider);
         const apy = await vault.getAPY();
         return {
           ...baseStats,
@@ -137,7 +137,7 @@ export function Dashboard() {
     try {
       const amount = parseFloat(depositAmount);
       const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const vault = new MorphoVault(provider);
+      const vault = new ExecutionVault(provider);
       const apy = await vault.getAPY();
       const yearlyTotal = amount * (apy / 100);
 

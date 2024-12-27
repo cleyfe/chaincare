@@ -28,7 +28,7 @@ const IPOR_VAULT_ADDRESS = "0x45aa96f0b3188d47a1dafdbefce1db6b37f58216";
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const IPOR_API_URL = "https://api.ipor.io/fusion/vaults";
 
-export class MorphoVault {
+export class ExecutionVault {
   private vaultContract: ethers.Contract;
   private usdcContract: ethers.Contract;
   private provider: ethers.BrowserProvider;
