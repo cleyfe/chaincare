@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState } from "react";
-import { ExecutionVault } from "@/lib/morpho";
+import { ExecutionVault } from "@/lib/execution";
 import { ethers } from "ethers";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { DepositModal } from "@/components/ui/deposit-modal";

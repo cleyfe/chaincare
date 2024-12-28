@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle } from "lucide-react";
 import { initWeb3, getAccount } from "@/lib/web3";
-import { ExecutionVault } from "@/lib/morpho";
+import { ExecutionVault } from "@/lib/execution";
 import { ethers } from "ethers";
 import type { VaultDeposit, Stats } from "@/types/api";
 

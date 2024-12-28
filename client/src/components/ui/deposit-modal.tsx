@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { ExecutionVault } from "@/lib/morpho";
+import { ExecutionVault } from "@/lib/execution";
 import { ethers } from "ethers";
 
 interface DepositModalProps {
