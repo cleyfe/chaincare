@@ -107,7 +107,7 @@ export function Dashboard() {
     try {
       setIsWithdrawing(true);
       const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const vault = new MorphoVault(provider);
+      const vault = new ExecutionVault(provider);
       const tx = await vault.withdraw(withdrawAmount);
 
       toast({
@@ -126,6 +126,39 @@ export function Dashboard() {
       setIsWithdrawing(false);
     }
   };
+
+  // Add function to trigger achievement
+  const checkAndAwardAchievement = async (amount: number) => {
+    if (!primaryWallet?.address) return;
+
+    try {
+      const response = await fetch('/api/achievements/check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: primaryWallet.address,
+          depositAmount: amount
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to check achievements');
+      }
+
+      const result = await response.json();
+      if (result.newAchievement) {
+        toast({
+          title: "Achievement Unlocked! 🏆",
+          description: `You've earned the ${result.newAchievement.name} badge!`
+        });
+      }
+    } catch (error) {
+      console.error('Error checking achievements:', error);
+    }
+  };
+
 
   const simulateImpact = async () => {
     if (!depositAmount || isNaN(parseFloat(depositAmount))) {
@@ -165,6 +198,10 @@ export function Dashboard() {
         isOpen={showDepositModal}
         onClose={() => setShowDepositModal(false)}
         amount={depositAmount}
+        onDeposit={async () => {
+          await checkAndAwardAchievement(parseFloat(depositAmount));
+          setShowDepositModal(false);
+        }}
       />
       <div>
         <h1 className="text-3xl font-bold mb-2">ChainCare Humanitarian Fund</h1>

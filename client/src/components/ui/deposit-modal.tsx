@@ -16,9 +16,10 @@ interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
   amount: string;
+  onDeposit?: () => Promise<void>;
 }
 
-export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
+export function DepositModal({ isOpen, onClose, amount, onDeposit }: DepositModalProps) {
   const [isApproving, setIsApproving] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
   const { toast } = useToast();
@@ -92,6 +93,11 @@ export function DepositModal({ isOpen, onClose, amount }: DepositModalProps) {
 
       const tx = await vault.deposit(amount);
       await tx.wait();
+
+      // Call the onDeposit callback to trigger achievement check
+      if (onDeposit) {
+        await onDeposit();
+      }
 
       toast({
         title: "Deposit successful",

@@ -2,8 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { db } from "@db";
-import { investments, projects, distributions, auditTrail, rewardPoints, pointsHistory } from "@db/schema";
+import { investments, projects, distributions, auditTrail, rewardPoints, pointsHistory, achievements, userAchievements } from "@db/schema";
 import { eq, and, sql } from "drizzle-orm";
+import { ethers } from "ethers";
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
@@ -11,50 +12,112 @@ export function registerRoutes(app: Express): Server {
   // Setup authentication routes and middleware
   setupAuth(app);
 
-  // Stats endpoint
-  app.get("/api/stats", async (_req, res) => {
-    const [
-      depositsResult,
-      projectsResult,
-      distributionsResult
-    ] = await Promise.all([
-      // Get total deposits and monthly growth
-      db.query.investments.findMany(),
-      // Get project counts
-      db.query.projects.findMany(),
-      // Get distribution stats
-      db.query.distributions.findMany()
-    ]);
+  // Stats endpoint with real-time balance
+  app.get("/api/stats", async (req, res) => {
+    try {
+      const [
+        depositsResult,
+        projectsResult,
+        distributionsResult
+      ] = await Promise.all([
+        // Get total deposits and monthly growth
+        db.query.investments.findMany(),
+        // Get project counts
+        db.query.projects.findMany(),
+        // Get distribution stats
+        db.query.distributions.findMany()
+      ]);
 
-    const totalDeposits = depositsResult.reduce((sum, d) => sum + parseFloat(d.amount), 0);
+      // Get real-time balance from smart contract
+      const provider = new ethers.JsonRpcProvider("https://mainnet.base.org");
+      const abi = ["function balanceOf(address) view returns (uint256)"];
+      const vaultAddress = "0x45aa96f0b3188d47a1dafdbefce1db6b37f58216";
+      const contract = new ethers.Contract(vaultAddress, abi, provider);
+      const totalDeposits = await contract.balanceOf(req.query.walletAddress || "0x0");
+      const formattedDeposits = parseFloat(ethers.formatUnits(totalDeposits, 6));
 
-    // Calculate monthly growth
-    const now = new Date();
-    const lastMonth = new Date(now.setMonth(now.getMonth() - 1));
-    const lastMonthDeposits = depositsResult
-      .filter(d => new Date(d.timestamp) < lastMonth)
-      .reduce((sum, d) => sum + parseFloat(d.amount), 0);
+      // Calculate monthly growth
+      const now = new Date();
+      const lastMonth = new Date(now.setMonth(now.getMonth() - 1));
+      const lastMonthDeposits = depositsResult
+        .filter(d => new Date(d.timestamp) < lastMonth)
+        .reduce((sum, d) => sum + parseFloat(d.amount), 0);
 
-    const depositGrowth = lastMonthDeposits ? 
-      ((totalDeposits - lastMonthDeposits) / lastMonthDeposits) * 100 : 
-      0;
+      const depositGrowth = lastMonthDeposits ? 
+        ((formattedDeposits - lastMonthDeposits) / lastMonthDeposits) * 100 : 
+        0;
 
-    // Assuming 4% APY from Morpho for now
-    const interestRate = 4;
-    const totalInterest = totalDeposits * (interestRate / 100);
+      // Assuming 4% APY for now
+      const interestRate = 4;
+      const totalInterest = formattedDeposits * (interestRate / 100);
 
-    const stats = {
-      totalDeposits,
-      depositGrowth,
-      activeProjects: projectsResult.filter(p => p.status === 'active').length,
-      completedProjects: projectsResult.filter(p => p.status === 'completed').length,
-      totalInterest,
-      interestRate,
-      totalDistributed: distributionsResult.reduce((sum, d) => sum + parseFloat(d.amount), 0),
-      beneficiaries: new Set(distributionsResult.map(d => d.recipientId)).size
-    };
+      const stats = {
+        totalDeposits: formattedDeposits,
+        depositGrowth,
+        activeProjects: projectsResult.filter(p => p.status === 'active').length,
+        completedProjects: projectsResult.filter(p => p.status === 'completed').length,
+        totalInterest,
+        interestRate,
+        totalDistributed: distributionsResult.reduce((sum, d) => sum + parseFloat(d.amount), 0),
+        beneficiaries: new Set(distributionsResult.map(d => d.recipientId)).size
+      };
 
-    res.json(stats);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // Achievement check endpoint
+  app.post("/api/achievements/check", async (req, res) => {
+    try {
+      const { walletAddress, depositAmount } = req.body;
+
+      // Get user's current points
+      const userPoints = await db.query.rewardPoints.findFirst({
+        where: eq(rewardPoints.accountId, walletAddress)
+      });
+
+      const totalPoints = parseFloat(userPoints?.points || "0") + depositAmount;
+
+      // Get all achievements user hasn't earned yet
+      const earnedAchievements = await db.query.userAchievements.findMany({
+        where: eq(userAchievements.userId, walletAddress)
+      });
+
+      const earnedIds = earnedAchievements.map(a => a.achievementId);
+
+      // Find next possible achievement
+      const nextAchievement = await db.query.achievements.findFirst({
+        where: sql`${achievements.id} NOT IN (${earnedIds.join(",")})
+                  AND ${achievements.pointsRequired} <= ${totalPoints}`
+      });
+
+      if (nextAchievement) {
+        // Award the achievement
+        await db.insert(userAchievements).values({
+          userId: walletAddress,
+          achievementId: nextAchievement.id
+        });
+
+        res.json({ 
+          success: true, 
+          newAchievement: nextAchievement 
+        });
+      } else {
+        res.json({ 
+          success: true, 
+          newAchievement: null 
+        });
+      }
+    } catch (error) {
+      console.error("Error checking achievements:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to check achievements" 
+      });
+    }
   });
 
   // Investments history
