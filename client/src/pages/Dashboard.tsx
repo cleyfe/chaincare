@@ -222,7 +222,7 @@ export function Dashboard() {
               {formatUSD(stats?.totalDeposits || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              +{stats?.depositGrowth.toFixed(2)}% from last month
+              +{(stats?.depositGrowth ?? 0).toFixed(2)}% from last month
             </p>
           </CardContent>
         </Card>
